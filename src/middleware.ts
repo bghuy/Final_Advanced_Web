@@ -4,7 +4,7 @@ import {
     publicRoutes,
     // apiAuthPrefix,
     // DEFAULT_LOGIN_REDIRECT,
-    // authRoutes
+    authRoutes
 } from "./routes";
 
 import { NextResponse, NextRequest } from 'next/server'; 
@@ -14,9 +14,9 @@ const apiUrl = process.env.API_URL || 'https://your-api-url.com';
 export async function middleware(req: NextRequest) {
     const { nextUrl, headers } = req;
     const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
+    const isAuthRoute =  authRoutes.includes(nextUrl.pathname);
 
-
-    if (isPublicRoute) {
+    if (isPublicRoute || isAuthRoute) {
         return NextResponse.next();
     }
 
