@@ -5,7 +5,8 @@
  */
 export const publicRoutes = [
     "/",
-    "/api/uploadthing"
+    "/api/uploadthing",
+    "/tasks"
 ];
 
 /**
