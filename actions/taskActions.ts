@@ -3,130 +3,139 @@
 import { Task } from "@/types/task"
 import { v4 as uuidv4 } from 'uuid'
 
+// Mock data with more realistic dates
 const tasks: Task[] = [
   {
     id: "1",
     title: "Complete project proposal",
     description: "Draft and finalize the project proposal for the new client",
-    deadline: "2023-12-31",
+    deadline: "2024-12-09", // Random future date within 1-7 days
     status: "In Progress",
     priority: "high",
-    created_at: "2023-11-15T09:00:00Z",
-    updated_at: "2023-11-15T09:00:00Z",
-    focusSessions: 0,
+    created_at: "2024-12-06T09:00:00Z",
+    updated_at: "2024-12-06T09:00:00Z"
   },
   {
     id: "2",
     title: "Review code changes",
     description: "Review and approve the latest pull requests",
-    deadline: "2023-12-20",
+    deadline: "2024-12-11", // Random future date within 1-7 days
     status: "Todo",
     priority: "medium",
-    created_at: "2023-11-16T10:30:00Z",
-    updated_at: "2023-11-16T10:30:00Z",
-    focusSessions: 0,
+    created_at: "2024-12-06T10:30:00Z",
+    updated_at: "2024-12-06T10:30:00Z"
   },
   {
     id: "3",
     title: "Update documentation",
     description: "Update the user guide with the latest features",
-    deadline: "2023-12-25",
+    deadline: "2024-12-12", // Random future date within 1-7 days
     status: "Completed",
     priority: "low",
-    created_at: "2023-11-17T11:45:00Z",
-    updated_at: "2023-11-18T14:20:00Z",
-    focusSessions: 2,
+    created_at: "2024-12-06T11:45:00Z",
+    updated_at: "2024-12-06T11:45:00Z"
   },
   {
     id: "4",
     title: "Prepare presentation",
     description: "Create slides for the upcoming team meeting",
-    deadline: "2023-12-22",
+    deadline: "2024-12-10", // Random future date within 1-7 days
     status: "In Progress",
     priority: "medium",
-    created_at: "2023-11-18T13:15:00Z",
-    updated_at: "2023-11-18T13:15:00Z",
-    focusSessions: 1,
+    created_at: "2024-12-06T13:15:00Z",
+    updated_at: "2024-12-06T13:15:00Z"
   },
   {
     id: "5",
     title: "Debug reported issues",
     description: "Investigate and fix bugs reported by QA team",
-    deadline: "2023-12-18",
+    deadline: "2024-12-08", // Random future date within 1-7 days
     status: "Expired",
     priority: "high",
-    created_at: "2023-11-19T09:30:00Z",
-    updated_at: "2023-11-20T11:45:00Z",
-    focusSessions: 0,
+    created_at: "2024-12-06T09:30:00Z",
+    updated_at: "2024-12-06T09:30:00Z"
+  },
+  {
+    id: "6",
+    title: "Weekly team meeting",
+    description: "Regular team sync-up and progress review",
+    deadline: "2024-12-13", // Random future date within 1-7 days
+    status: "Todo",
+    priority: "medium",
+    created_at: "2024-12-06T09:00:00Z",
+    updated_at: "2024-12-06T09:00:00Z"
+  },
+  {
+    id: "7",
+    title: "Client presentation",
+    description: "Present project progress to the client",
+    deadline: "2024-12-14", // Random future date within 1-7 days
+    status: "Todo",
+    priority: "high",
+    created_at: "2024-12-06T09:00:00Z",
+    updated_at: "2024-12-06T09:00:00Z"
+  },
+  {
+    id: "8",
+    title: "Security audit",
+    description: "Perform security review of the application",
+    deadline: "2024-12-07", // Random future date within 1-7 days
+    status: "Todo",
+    priority: "high",
+    created_at: "2024-12-06T09:00:00Z",
+    updated_at: "2024-12-06T09:00:00Z"
   }
-]
+];
 
-export async function getTasks(): Promise<Task[]> {
-  try {
-    // Simulating API delay
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    return tasks
-  } catch (error) {
-    console.error("Failed to fetch tasks:", error)
-    throw new Error("Failed to fetch tasks. Please try again later.")
-  }
+export const getTasks = async (): Promise<Task[]> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 500));
+  return tasks;
 }
 
-export async function editTask(updatedTask: Task): Promise<Task> {
-  try {
-    // Simulating API delay
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    const index = tasks.findIndex(task => task.id === updatedTask.id)
-    if (index === -1) {
-      throw new Error("Task not found")
-    }
-    
-    updatedTask.updated_at = new Date().toISOString()
-    tasks[index] = updatedTask
-    return updatedTask
-  } catch (error) {
-    console.error("Failed to edit task:", error)
-    throw new Error("Failed to edit task. Please try again later.")
-  }
+export const getTask = async (id: string): Promise<Task | undefined> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 500));
+  return tasks.find(task => task.id === id);
 }
 
-export async function deleteTask(taskId: string): Promise<void> {
-  try {
-    // Simulating API delay
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    const index = tasks.findIndex(task => task.id === taskId)
-    if (index === -1) {
-      throw new Error("Task not found")
-    }
-    
-    tasks.splice(index, 1)
-  } catch (error) {
-    console.error("Failed to delete task:", error)
-    throw new Error("Failed to delete task. Please try again later.")
-  }
+export const createTask = async (task: Omit<Task, 'id' | 'created_at' | 'updated_at'>): Promise<Task> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  const newTask: Task = {
+    ...task,
+    id: uuidv4(),
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  };
+  
+  tasks.push(newTask);
+  return newTask;
 }
 
-export async function createTask(newTask: Omit<Task, 'id' | 'created_at' | 'updated_at' | 'focusSessions'>): Promise<Task> {
-  try {
-    // Simulating API delay
-    await new Promise(resolve => setTimeout(resolve, 1000))
+export const editTask = async (updatedTask: Task): Promise<Task> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  const index = tasks.findIndex(task => task.id === updatedTask.id);
+  if (index === -1) throw new Error('Task not found');
+  
+  tasks[index] = {
+    ...updatedTask,
+    updated_at: new Date().toISOString()
+  };
+  
+  return tasks[index];
+}
 
-    const now = new Date().toISOString()
-    const task: Task = {
-      ...newTask,
-      id: uuidv4(), // Generate a unique ID using uuid
-      created_at: now,
-      updated_at: now,
-      focusSessions: 0,
-    }
-
-    tasks.push(task)
-    return task
-  } catch (error) {
-    console.error("Failed to create task:", error)
-    throw new Error("Failed to create task. Please try again later.")
-  }
+export const deleteTask = async (id: string): Promise<void> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  const index = tasks.findIndex(task => task.id === id);
+  if (index === -1) throw new Error('Task not found');
+  
+  tasks.splice(index, 1);
 }
 

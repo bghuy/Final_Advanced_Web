@@ -21,6 +21,7 @@ import { useState, useTransition } from "react"
 import { redirect } from 'next/navigation'
 import { DEFAULT_LOGIN_REDIRECT } from "@/routes"
 import { useSearchParams } from "next/navigation"
+import { useRouter } from 'next/navigation'
 export const LoginForm = () =>{
     const searchParams = useSearchParams();
     const urlError = searchParams.get("error") === "OAuthAccountNotLinked"
@@ -29,6 +30,7 @@ export const LoginForm = () =>{
     const [isPending,startTransition] = useTransition();
     const [error,setError] = useState<string | undefined>("");
     const [success,setSuccess] = useState<string | undefined>("")
+    const router = useRouter();
     const form = useForm<z.infer<typeof LoginSchema>>({
         resolver: zodResolver(LoginSchema),
         defaultValues: {
@@ -36,19 +38,28 @@ export const LoginForm = () =>{
             password: "",
         },
     });
-    const submitForm = (values: z.infer<typeof LoginSchema>) => {
+    const onSubmit = async (values: z.infer<typeof LoginSchema>) => {
         setError("");
         setSuccess("");
-        startTransition(async()=>{
-            const response = await login(values);
-            setError(response.error || "");
-            setSuccess(response.success || "");
 
-            if (response.success) {
-                redirect(DEFAULT_LOGIN_REDIRECT);
+        startTransition(async () => {
+            try {
+                const response = await login(values);
+                
+                if (response.error) {
+                    setError(response.error);
+                    return;
+                }
+                
+                if (response.success) {
+                    setSuccess(response.success);
+                    router.push(DEFAULT_LOGIN_REDIRECT);
+                }
+            } catch (error) {
+                setError("Something went wrong!");
             }
-        })
-    }
+        });
+    };
     return (
         <CardWrapper
             headerLabel="Welcome back"
@@ -59,7 +70,7 @@ export const LoginForm = () =>{
             <Form {...form}>
                 <form 
                     action="" 
-                    onSubmit={form.handleSubmit((values)=>{submitForm(values)})}
+                    onSubmit={form.handleSubmit((values)=>{onSubmit(values)})}
                     className="space-y-6"
                 >
                     <div className="space-y-4">

@@ -1,115 +1,112 @@
-import { useEffect, useState } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
-import { Task } from "@/types/task"
-import { Edit, Trash2, Loader2 } from 'lucide-react'
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
+import { Task } from "@/types/task";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Edit, Trash2 } from "lucide-react";
 
-interface TaskDetailModalProps {
+export interface TaskDetailModalProps {
   task: Task | null;
   isOpen: boolean;
   onClose: () => void;
-  onEdit: (task: Task) => void;
-  onDelete: (taskId: string) => void;
-  isLoading: boolean;
   onOpenEditModal: () => void;
+  onEdit?: (task: Task) => void;
+  onDelete?: (task: Task) => void;
+  isLoading: boolean;
 }
 
-export function TaskDetailModal({ task, isOpen, onClose, onEdit, onDelete, isLoading, onOpenEditModal }: TaskDetailModalProps) {
-  //const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-
+export function TaskDetailModal({
+  task,
+  isOpen,
+  onClose,
+  onOpenEditModal,
+  onEdit,
+  onDelete,
+  isLoading
+}: TaskDetailModalProps) {
   if (!task) return null;
 
-  const getStatusColor = (status: Task['status']) => {
+  const getStatusColor = (status: Task['status']): string => {
     switch (status) {
       case 'Todo':
-        return 'bg-yellow-500'
+        return 'bg-yellow-500';
       case 'In Progress':
-        return 'bg-blue-500'
+        return 'bg-blue-500';
       case 'Completed':
-        return 'bg-green-500'
+        return 'bg-green-500';
       case 'Expired':
-        return 'bg-red-500'
+        return 'bg-red-500';
       default:
-        return 'bg-gray-500'
+        return 'bg-gray-500';
     }
-  }
+  };
 
-  const getPriorityColor = (priority: Task['priority']) => {
+  const getPriorityColor = (priority: Task['priority']): string => {
     switch (priority) {
       case 'high':
-        return 'bg-red-500'
+        return 'bg-red-500';
       case 'medium':
-        return 'bg-yellow-500'
+        return 'bg-yellow-500';
       case 'low':
-        return 'bg-green-500'
+        return 'bg-green-500';
       default:
-        return 'bg-gray-500'
+        return 'bg-gray-500';
     }
-  }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px] h-full data-[state=open]:rounded-none overflow-y-auto" position="right">
+      <DialogContent>
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold">{task.title}</DialogTitle>
-          <DialogDescription>View task details.</DialogDescription>
+          <DialogTitle>{task.title}</DialogTitle>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
+        <div className="space-y-4">
           <div>
-            <Label className="text-right font-bold">Description</Label>
+            <h4 className="text-sm font-medium">Description</h4>
             <p className="text-sm text-gray-500">{task.description}</p>
           </div>
           <div>
-            <Label className="text-right font-bold">Deadline</Label>
-            <p className="text-sm text-gray-500">{new Date(task.deadline).toLocaleDateString()}</p>
+            <h4 className="text-sm font-medium">Deadline</h4>
+            <p className="text-sm text-gray-500">
+              {new Date(task.deadline).toLocaleDateString()}
+            </p>
           </div>
           <div>
-            <Label className="text-right font-bold">Status</Label>
+            <h4 className="text-sm font-medium">Status</h4>
             <Badge className={`${getStatusColor(task.status)} text-white`}>
               {task.status}
             </Badge>
           </div>
           <div>
-            <Label className="text-right font-bold">Priority</Label>
+            <h4 className="text-sm font-medium">Priority</h4>
             <Badge className={`${getPriorityColor(task.priority)} text-white`}>
               {task.priority}
             </Badge>
           </div>
-          <div>
-            <Label className="text-right font-bold">Created At</Label>
-            <p className="text-sm text-gray-500">{new Date(task.created_at).toLocaleString()}</p>
-          </div>
-          <div>
-            <Label className="text-right font-bold">Updated At</Label>
-            <p className="text-sm text-gray-500">{new Date(task.updated_at).toLocaleString()}</p>
-          </div>
-        </div>
-        <div className="flex justify-end space-x-2">
-          <Button variant="outline" onClick={() => {
-            onClose();
-            onOpenEditModal();
-          }}>
-            <Edit className="mr-2 h-4 w-4" />
-            Edit
-          </Button>
-          <Button variant="destructive" onClick={() => onDelete(task.id)} disabled={isLoading}>
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Deleting...
-              </>
-            ) : (
-              <>
-                <Trash2 className="mr-2 h-4 w-4" />
+          <div className="flex justify-end space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onOpenEditModal}
+              disabled={isLoading}
+            >
+              <Edit className="h-4 w-4 mr-2" />
+              Edit
+            </Button>
+            {onDelete && (
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => task && onDelete(task)}
+                disabled={isLoading}
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
                 Delete
-              </>
+              </Button>
             )}
-          </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
 
