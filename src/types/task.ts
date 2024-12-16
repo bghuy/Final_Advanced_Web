@@ -3,9 +3,10 @@ export interface Task {
   title: string;
   description: string;
   deadline: string;
-  status: 'pending' | 'in progress' | 'done' | 'missed';
+  status: 'Todo' | 'In Progress' | 'Completed' | 'Expired';
   priority: 'high' | 'medium' | 'low';
   created_at: string;
   updated_at: string;
+  focusSessions?: number;
 }
 

@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useForm, Controller } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -11,21 +12,26 @@ import { Loader2 } from 'lucide-react'
 interface CreateTaskModalProps {
   isOpen: boolean
   onClose: () => void
-  onCreateTask: (task: Omit<Task, 'id' | 'created_at' | 'updated_at'>) => void
+  onCreateTask: (task: Omit<Task, 'id' | 'created_at' | 'updated_at' | 'focusSessions'>) => void
   isLoading: boolean
 }
 
+type FormData = Omit<Task, 'id' | 'created_at' | 'updated_at' | 'focusSessions'>
+
 export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: CreateTaskModalProps) {
-  const [newTask, setNewTask] = useState<Omit<Task, 'id' | 'created_at' | 'updated_at'>>({
-    title: '',
-    description: '',
-    deadline: '',
-    status: 'pending',
-    priority: 'medium',
+  const { control, handleSubmit, formState: { errors, isValid } } = useForm<FormData>({
+    defaultValues: {
+      title: '',
+      description: '',
+      deadline: '',
+      status: 'Todo',
+      priority: 'medium',
+    },
+    mode: 'onChange'
   })
 
-  const handleCreateTask = () => {
-    onCreateTask(newTask)
+  const onSubmit = (data: FormData) => {
+    onCreateTask(data)
   }
 
   return (
@@ -35,92 +41,109 @@ export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: Cr
           <DialogTitle>Add New Task</DialogTitle>
           <DialogDescription>Fill in the details to create a new task.</DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="title" className="text-right">
               Title
             </Label>
-            <Input
-              id="title"
-              value={newTask.title}
-              onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
-              className="col-span-3"
-            />
+            <div className="col-span-3">
+              <Controller
+                name="title"
+                control={control}
+                rules={{ required: "Title is required" }}
+                render={({ field }) => <Input {...field} id="title" />}
+              />
+              {errors.title && <p className="text-sm text-red-500 mt-1">{errors.title.message}</p>}
+            </div>
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="description" className="text-right">
               Description
             </Label>
-            <Textarea
-              id="description"
-              value={newTask.description}
-              onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
-              className="col-span-3"
-              rows={5}
+            <Controller
+              name="description"
+              control={control}
+              render={({ field }) => <Textarea {...field} id="description" className="col-span-3" rows={5} />}
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="deadline" className="text-right">
               Deadline
             </Label>
-            <Input
-              id="deadline"
-              type="date"
-              value={newTask.deadline}
-              onChange={(e) => setNewTask({ ...newTask, deadline: e.target.value })}
-              className="col-span-3"
-            />
+            <div className="col-span-3">
+              <Controller
+                name="deadline"
+                control={control}
+                rules={{ required: "Deadline is required" }}
+                render={({ field }) => <Input {...field} id="deadline" type="date" />}
+              />
+              {errors.deadline && <p className="text-sm text-red-500 mt-1">{errors.deadline.message}</p>}
+            </div>
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="status" className="text-right">
               Status
             </Label>
-            <Select
-              value={newTask.status}
-              onValueChange={(value) => setNewTask({ ...newTask, status: value as Task['status'] })}
-            >
-              <SelectTrigger className="col-span-3">
-                <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="in progress">In Progress</SelectItem>
-                <SelectItem value="done">Done</SelectItem>
-                <SelectItem value="missed">Missed</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="col-span-3">
+              <Controller
+                name="status"
+                control={control}
+                rules={{ required: "Status is required" }}
+                render={({ field }) => (
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Todo">Todo</SelectItem>
+                      <SelectItem value="In Progress">In Progress</SelectItem>
+                      <SelectItem value="Completed">Completed</SelectItem>
+                      <SelectItem value="Expired">Expired</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.status && <p className="text-sm text-red-500 mt-1">{errors.status.message}</p>}
+            </div>
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="priority" className="text-right">
               Priority
             </Label>
-            <Select
-              value={newTask.priority}
-              onValueChange={(value) => setNewTask({ ...newTask, priority: value as Task['priority'] })}
-            >
-              <SelectTrigger className="col-span-3">
-                <SelectValue placeholder="Select priority" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="high">High</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="low">Low</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="col-span-3">
+              <Controller
+                name="priority"
+                control={control}
+                rules={{ required: "Priority is required" }}
+                render={({ field }) => (
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select priority" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="high">High</SelectItem>
+                      <SelectItem value="medium">Medium</SelectItem>
+                      <SelectItem value="low">Low</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.priority && <p className="text-sm text-red-500 mt-1">{errors.priority.message}</p>}
+            </div>
           </div>
-        </div>
-        <DialogFooter>
-          <Button onClick={handleCreateTask} disabled={isLoading}>
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Creating...
-              </>
-            ) : (
-              'Create Task'
-            )}
-          </Button>
-        </DialogFooter>
+          <DialogFooter>
+            <Button type="submit" disabled={isLoading || !isValid}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                'Create Task'
+              )}
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   )

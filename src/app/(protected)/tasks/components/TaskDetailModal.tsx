@@ -1,4 +1,4 @@
-// import { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Task } from "@/types/task"
 import { Edit, Trash2, Loader2 } from 'lucide-react'
@@ -23,13 +23,13 @@ export function TaskDetailModal({ task, isOpen, onClose, onEdit, onDelete, isLoa
 
   const getStatusColor = (status: Task['status']) => {
     switch (status) {
-      case 'pending':
+      case 'Todo':
         return 'bg-yellow-500'
-      case 'in progress':
+      case 'In Progress':
         return 'bg-blue-500'
-      case 'done':
+      case 'Completed':
         return 'bg-green-500'
-      case 'missed':
+      case 'Expired':
         return 'bg-red-500'
       default:
         return 'bg-gray-500'
@@ -51,11 +51,7 @@ export function TaskDetailModal({ task, isOpen, onClose, onEdit, onDelete, isLoa
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent 
-        className="sm:max-w-[425px] h-full overflow-y-auto data-[state=closed]:animate-none data-[state=closed]:duration-0 data-[state=open]:transition-all sm:rounded-none" 
-        position="right" 
-        forceMount
-      >
+      <DialogContent className="sm:max-w-[425px] h-full data-[state=open]:rounded-none overflow-y-auto" position="right">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold">{task.title}</DialogTitle>
           <DialogDescription>View task details.</DialogDescription>

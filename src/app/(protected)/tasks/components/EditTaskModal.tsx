@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
+import { useForm, Controller } from 'react-hook-form'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -17,129 +18,134 @@ interface EditTaskModalProps {
 }
 
 export function EditTaskModal({ task, isOpen, onClose, onUpdateTask, isLoading }: EditTaskModalProps) {
-  const [editedTask, setEditedTask] = useState<Task | null>(task)
+  const { control, handleSubmit, reset, formState: { errors, isValid } } = useForm<Task>({
+    defaultValues: task || {},
+    mode: 'onChange'
+  })
 
   useEffect(() => {
-    setEditedTask(task)
-  }, [task])
+    if (task) {
+      reset(task)
+    }
+  }, [task, reset])
 
-  if (!editedTask) return null
-
-  const handleUpdateTask = () => {
-    if (editedTask) {
-      onUpdateTask(editedTask)
-      onClose()
+  const onSubmit = (data: Task) => {
+    if (task) {
+      onUpdateTask({ ...task, ...data, updated_at: new Date().toISOString() })
     }
   }
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setEditedTask(prev => prev ? { ...prev, [name]: value } : null)
-  }
-
-  const handleSelectChange = (name: string, value: string) => {
-    setEditedTask(prev => prev ? { ...prev, [name]: value } : null)
-  }
+  if (!task) return null
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent 
-        className="sm:max-w-[425px] h-full overflow-y-auto data-[state=open]:animate-none data-[state=open]:duration-0 data-[state=close]:transition-all sm:rounded-none" 
-        position='right' 
-        forceMount
-      >
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Edit Task</DialogTitle>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="edit-title" className="text-right">
               Title
             </Label>
-            <Input
-              id="edit-title"
-              name="title"
-              value={editedTask.title}
-              onChange={handleInputChange}
-              className="col-span-3"
-            />
+            <div className="col-span-3">
+              <Controller
+                name="title"
+                control={control}
+                rules={{ required: "Title is required" }}
+                render={({ field }) => <Input {...field} id="edit-title" />}
+              />
+              {errors.title && <p className="text-sm text-red-500 mt-1">{errors.title.message}</p>}
+            </div>
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="edit-description" className="text-right">
               Description
             </Label>
-            <Textarea
-              id="edit-description"
+            <Controller
               name="description"
-              value={editedTask.description}
-              onChange={handleInputChange}
-              className="col-span-3"
-              rows={5}
+              control={control}
+              render={({ field }) => <Textarea {...field} id="edit-description" className="col-span-3" rows={5} />}
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="edit-deadline" className="text-right">
               Deadline
             </Label>
-            <Input
-              id="edit-deadline"
-              name="deadline"
-              type="date"
-              value={editedTask.deadline}
-              onChange={handleInputChange}
-              className="col-span-3"
-            />
+            <div className="col-span-3">
+              <Controller
+                name="deadline"
+                control={control}
+                rules={{ required: "Deadline is required" }}
+                render={({ field }) => <Input {...field} id="edit-deadline" type="date" />}
+              />
+              {errors.deadline && <p className="text-sm text-red-500 mt-1">{errors.deadline.message}</p>}
+            </div>
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="edit-status" className="text-right">
               Status
             </Label>
-            <Select
-              value={editedTask.status}
-              onValueChange={(value) => handleSelectChange('status', value)}
-            >
-              <SelectTrigger className="col-span-3">
-                <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="in progress">In Progress</SelectItem>
-                <SelectItem value="done">Done</SelectItem>
-                <SelectItem value="missed">Missed</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="col-span-3">
+              <Controller
+                name="status"
+                control={control}
+                rules={{ required: "Status is required" }}
+                render={({ field }) => (
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Todo">Todo</SelectItem>
+                      <SelectItem value="In Progress">In Progress</SelectItem>
+                      <SelectItem value="Completed">Completed</SelectItem>
+                      <SelectItem value="Expired">Expired</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.status && <p className="text-sm text-red-500 mt-1">{errors.status.message}</p>}
+            </div>
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="edit-priority" className="text-right">
               Priority
             </Label>
-            <Select
-              value={editedTask.priority}
-              onValueChange={(value) => handleSelectChange('priority', value)}
-            >
-              <SelectTrigger className="col-span-3">
-                <SelectValue placeholder="Select priority" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="high">High</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="low">Low</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="col-span-3">
+              <Controller
+                name="priority"
+                control={control}
+                rules={{ required: "Priority is required" }}
+                render={({ field }) => (
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select priority" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="high">High</SelectItem>
+                      <SelectItem value="medium">Medium</SelectItem>
+                      <SelectItem value="low">Low</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.priority && <p className="text-sm text-red-500 mt-1">{errors.priority.message}</p>}
+            </div>
           </div>
-        </div>
-        <DialogFooter>
-          <Button onClick={handleUpdateTask} disabled={isLoading}>
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Updating...
-              </>
-            ) : (
-              'Update Task'
-            )}
-          </Button>
-        </DialogFooter>
+          <DialogFooter>
+            <Button type="submit" disabled={isLoading || !isValid}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Updating...
+                </>
+              ) : (
+                'Update Task'
+              )}
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   )
