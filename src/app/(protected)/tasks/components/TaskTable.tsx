@@ -7,14 +7,15 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { TaskDetailModal } from "./TaskDetailModal"
 import { Task } from "@/types/task"
-import { Eye, ChevronUp, ChevronDown, Plus, Loader2, ArrowUpDown } from 'lucide-react'
+import { Eye, ChevronUp, ChevronDown, Plus, Loader2, ArrowUpDown, Bot, BarChart2 } from 'lucide-react'
 import { getTasks, editTask, deleteTask, createTask } from "../../../../../actions/taskActions"
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast"
 import { ColumnVisibilityToggle } from "./ColumnVisibilityToggle"
 import { CreateTaskModal } from "./CreateTaskModal"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Spinner } from "./Spinner" // Import Spinner component
-import { EditTaskModal } from "./EditTaskModal" // Add import for EditTaskModal
+import { Spinner } from "./Spinner"
+import { EditTaskModal } from "./EditTaskModal"
+import Link from "next/link"
 
 type SortConfig = {
   key: keyof Task;
@@ -22,7 +23,7 @@ type SortConfig = {
 } | null;
 
 type ColumnConfig = {
-  key: keyof Task;
+  key: string;
   label: string;
   isVisible: boolean;
 };
@@ -40,7 +41,7 @@ export function TaskTable() {
   const [isPending, startTransition] = useTransition()
   const [statusFilter, setStatusFilter] = useState<Task['status'] | 'all'>('all')
   const [priorityFilter, setPriorityFilter] = useState<Task['priority'] | 'all'>('all')
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false) // Add state for EditTaskModal
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
   const [columns, setColumns] = useState<ColumnConfig[]>([
     { key: 'title', label: 'Title', isVisible: true },
@@ -50,7 +51,7 @@ export function TaskTable() {
     { key: 'priority', label: 'Priority', isVisible: true },
     { key: 'created_at', label: 'Created At', isVisible: true },
     { key: 'updated_at', label: 'Updated At', isVisible: true },
-  ])
+  ] as ColumnConfig[])
 
   useEffect(() => {
     async function fetchData() {
@@ -59,8 +60,6 @@ export function TaskTable() {
         setTasks(fetchedTasks)
         setLoading(false)
       } catch (err) {
-        console.log(err);
-    
         setError("Failed to fetch data. Please try again later.")
         setLoading(false)
       }
@@ -74,35 +73,40 @@ export function TaskTable() {
     setIsModalOpen(true)
   }
 
-  const getStatusColor = (status: Task['status']) => {
+  const handleOpenEditModal = () => {
+    setIsModalOpen(false)
+    setIsEditModalOpen(true)
+  }
+
+  const getStatusColor = (status: Task['status']): string => {
     switch (status) {
-      case 'pending':
-        return 'bg-yellow-500'
-      case 'in progress':
-        return 'bg-blue-500'
-      case 'done':
-        return 'bg-green-500'
-      case 'missed':
-        return 'bg-red-500'
+      case 'Todo':
+        return 'bg-yellow-500 text-white'
+      case 'In Progress':
+        return 'bg-blue-500 text-white'
+      case 'Completed':
+        return 'bg-green-500 text-white'
+      case 'Expired':
+        return 'bg-red-500 text-white'
       default:
-        return 'bg-gray-500'
+        return 'bg-gray-500 text-white'
     }
   }
 
-  const getPriorityColor = (priority: Task['priority']) => {
+  const getPriorityColor = (priority: Task['priority']): string => {
     switch (priority) {
       case 'high':
-        return 'bg-red-500'
+        return 'bg-red-500 text-white'
       case 'medium':
-        return 'bg-yellow-500'
+        return 'bg-yellow-500 text-white'
       case 'low':
-        return 'bg-green-500'
+        return 'bg-green-500 text-white'
       default:
-        return 'bg-gray-500'
+        return 'bg-gray-500 text-white'
     }
   }
 
-  const handleSort = (key: keyof Task) => {
+  const handleSort = (key: string) => {
     setSortConfig((prevConfig) => {
       if (prevConfig && prevConfig.key === key) {
         if (prevConfig.direction === 'asc') {
@@ -136,18 +140,17 @@ export function TaskTable() {
     return result
   }, [tasks, searchTerm, sortConfig, statusFilter, priorityFilter])
 
-  const handleAddTask = (newTask: Omit<Task, 'id' | 'created_at' | 'updated_at'>) => {
+  const handleAddTask = (newTask: Omit<Task, 'id' | 'created_at' | 'updated_at' | 'focusSessions'>) => {
     startTransition(async () => {
       try {
         const createdTask = await createTask(newTask)
-        setTasks([...tasks, createdTask])
+        setTasks(prevTasks => [...prevTasks, createdTask])
         setIsAddTaskModalOpen(false)
         toast({
           title: "Task added",
           description: "The new task has been successfully added.",
         })
       } catch (error) {
-        console.log(error);
         toast({
           title: "Error",
           description: "Failed to add the task. Please try again.",
@@ -161,13 +164,13 @@ export function TaskTable() {
     startTransition(async () => {
       try {
         const result = await editTask(updatedTask)
-        setTasks(tasks.map(task => task.id === result.id ? result : task))
+        setTasks(prevTasks => prevTasks.map(task => task.id === result.id ? result : task))
+        setIsEditModalOpen(false)
         toast({
           title: "Task updated",
           description: "The task has been successfully updated.",
         })
       } catch (error) {
-        console.log(error);
         toast({
           title: "Error",
           description: "Failed to update the task. Please try again.",
@@ -181,14 +184,13 @@ export function TaskTable() {
     startTransition(async () => {
       try {
         await deleteTask(taskId)
-        setTasks(tasks.filter(task => task.id !== taskId))
+        setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId))
         setIsModalOpen(false)
         toast({
           title: "Task deleted",
           description: "The task has been successfully deleted.",
         })
       } catch (error) {
-        console.log(error);
         toast({
           title: "Error",
           description: "Failed to delete the task. Please try again.",
@@ -204,8 +206,14 @@ export function TaskTable() {
     ))
   }
 
+  const handleAnalyzeTask = (task: Task) => {
+    // Implement task analysis logic here
+    console.log('Analyzing task:', task);
+    // You can open a modal or navigate to a new page for task analysis
+  }
+
   if (loading) {
-    return <Spinner /> // Replace loading div with Spinner component
+    return <Spinner />
   }
 
   if (error) {
@@ -229,10 +237,10 @@ export function TaskTable() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="in progress">In Progress</SelectItem>
-              <SelectItem value="done">Done</SelectItem>
-              <SelectItem value="missed">Missed</SelectItem>
+              <SelectItem value="Todo">Todo</SelectItem>
+              <SelectItem value="In Progress">In Progress</SelectItem>
+              <SelectItem value="Completed">Completed</SelectItem>
+              <SelectItem value="Expired">Expired</SelectItem>
             </SelectContent>
           </Select>
           <Select value={priorityFilter} onValueChange={(value) => setPriorityFilter(value as Task['priority'] | 'all')}>
@@ -254,13 +262,20 @@ export function TaskTable() {
           </Button>
         </div>
       </div>
+      <div className="ms-auto mb-4">
+        <Link href="/ai-recommend">
+          <Button variant="outline">
+            <Bot className="mr-2 h-4 w-4" /> AI Recommendations
+          </Button>
+        </Link>
+      </div>
       <Table>
         <TableHeader>
           <TableRow>
             {columns.map(column => column.isVisible && (
               <TableHead 
                 key={column.key} 
-                onClick={() => handleSort(column.key as keyof Task)} 
+                onClick={() => handleSort(column.key)} 
                 className="cursor-pointer"
               >
                 <div className="flex items-center">
@@ -284,7 +299,7 @@ export function TaskTable() {
           {filteredAndSortedTasks.map((task) => (
             <TableRow key={task.id}>
               {columns.map(column => column.isVisible && (
-                <TableCell key={column.key}>
+                <TableCell key={`${task.id}-${column.key}`}>
                   {column.key === 'title' && task.title}
                   {column.key === 'description' && (
                     task.description.length > 20
@@ -293,12 +308,12 @@ export function TaskTable() {
                   )}
                   {column.key === 'deadline' && new Date(task.deadline).toLocaleDateString()}
                   {column.key === 'status' && (
-                    <Badge className={`${getStatusColor(task.status)} text-white`}>
+                    <Badge className={`${getStatusColor(task.status)}`}>
                       {task.status}
                     </Badge>
                   )}
                   {column.key === 'priority' && (
-                    <Badge className={`${getPriorityColor(task.priority)} text-white`}>
+                    <Badge className={`${getPriorityColor(task.priority)}`}>
                       {task.priority}
                     </Badge>
                   )}
@@ -307,15 +322,26 @@ export function TaskTable() {
                 </TableCell>
               ))}
               <TableCell className="text-right">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleViewDetail(task)}
-                  disabled={isPending}
-                >
-                  {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Eye className="mr-2 h-4 w-4" />}
-                  View Detail
-                </Button>
+                <div className="flex justify-end space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleViewDetail(task)}
+                    disabled={isPending}
+                  >
+                    {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Eye className="mr-2 h-4 w-4" />}
+                    View Detail
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleAnalyzeTask(task)}
+                    disabled={isPending}
+                  >
+                    <BarChart2 className="mr-2 h-4 w-4" />
+                    Analyze
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
           ))}
@@ -328,7 +354,7 @@ export function TaskTable() {
         onEdit={handleUpdateTask}
         onDelete={handleDeleteTask}
         isLoading={isPending}
-        onOpenEditModal={() => setIsEditModalOpen(true)} // Update TaskDetailModal usage
+        onOpenEditModal={handleOpenEditModal}
       />
       <CreateTaskModal
         isOpen={isAddTaskModalOpen}
@@ -336,7 +362,7 @@ export function TaskTable() {
         onCreateTask={handleAddTask}
         isLoading={isPending}
       />
-      <EditTaskModal // Add EditTaskModal component
+      <EditTaskModal
         task={selectedTask}
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}

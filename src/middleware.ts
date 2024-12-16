@@ -6,6 +6,7 @@ import {
     // DEFAULT_LOGIN_REDIRECT,
     authRoutes
 } from "./routes";
+import { match } from 'path-to-regexp';
 
 import { NextResponse, NextRequest } from 'next/server'; 
 import axios from 'axios'; // Import axios
@@ -13,7 +14,13 @@ import axios from 'axios'; // Import axios
 const apiUrl = process.env.API_URL || 'https://your-api-url.com';
 export async function middleware(req: NextRequest) {
     const { nextUrl, headers } = req;
-    const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
+    const pathname = nextUrl.pathname;
+    const isPublicRoute = publicRoutes.some(route => {
+        const matcher = match(route, { decode: decodeURIComponent });
+        return matcher(pathname); // Kiểm tra xem pathname có khớp với route
+    });
+    console.log(nextUrl.pathname,"next");
+    
     const isAuthRoute =  authRoutes.includes(nextUrl.pathname);
 
     if (isPublicRoute || isAuthRoute) {

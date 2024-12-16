@@ -6,7 +6,10 @@
 export const publicRoutes = [
     "/",
     "/api/uploadthing",
-    "/tasks"
+    "/tasks",
+    "/task/:id",
+    "/ai-recommend",
+    "/task/:id/focus-timer"
 ];
 
 /**
