@@ -112,8 +112,21 @@ export const authService = {
   },
 
   async logout() {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('access_token');
+    try {
+      // Clear localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('access_token');
+      }
+
+      // Clear cookie
+      document.cookie = 'access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT';
+
+      // Clear axios headers
+      api.defaults.headers.common['Authorization'] = '';
+
+    } catch (error) {
+      console.error('Logout error:', error);
+      throw error;
     }
   }
 }; 

@@ -90,7 +90,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       router.push('/auth/login');
     } catch (error) {
       console.error('Logout error:', error);
-      // Still redirect even if logout API fails
+      // Still redirect even if logout fails
       router.push('/auth/login');
     }
   };

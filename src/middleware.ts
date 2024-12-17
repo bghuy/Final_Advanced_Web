@@ -1,29 +1,34 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { authRoutes, publicRoutes, apiAuthPrefix, DEFAULT_LOGIN_REDIRECT } from "@/routes";
 
 export function middleware(request: NextRequest) {
-  const accessToken = request.cookies.get('access_token');
-  const isAuthPage = request.nextUrl.pathname.startsWith('/login') || 
-                     request.nextUrl.pathname.startsWith('/register');
+  const { nextUrl } = request;
+  const isLoggedIn = request.cookies.has('access_token');
 
-  if (!accessToken && !isAuthPage) {
-    return NextResponse.redirect(new URL('/login', request.url));
+  const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
+  const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
+  const isAuthRoute = authRoutes.includes(nextUrl.pathname);
+
+  if (isApiAuthRoute) {
+    return NextResponse.next();
   }
 
-  if (accessToken && isAuthPage) {
-    return NextResponse.redirect(new URL('/tasks', request.url));
+  if (isAuthRoute) {
+    if (isLoggedIn) {
+      return NextResponse.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
+    }
+    return NextResponse.next();
+  }
+
+  if (!isLoggedIn && !isPublicRoute) {
+    return NextResponse.redirect(new URL("/auth/login", nextUrl));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: [
-    '/tasks/:path*',
-    '/ai-recommend/:path*',
-    '/login',
-    '/register',
-    '/((?!login/redirect).*)'
-  ]
-};
+  matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
+}
 

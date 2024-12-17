@@ -5,11 +5,7 @@
  */
 export const publicRoutes = [
     "/",
-    "/api/uploadthing",
-    "/tasks",
-    "/task/:id",
-    "/ai-recommend",
-    "/task/:id/focus-timer"
+    "/auth/verify",
 ];
 
 /**
@@ -20,7 +16,9 @@ export const publicRoutes = [
 export const authRoutes = [
     "/auth/login",
     "/auth/register",
-    "/auth/error"
+    "/auth/error",
+    "/auth/reset",
+    "/auth/new-password"
 ];
 
 /**
