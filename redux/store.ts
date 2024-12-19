@@ -4,7 +4,7 @@ import userReducer from './slices/userSlice';
 // Tạo Redux Store
 export const store = configureStore({
   reducer: {
-    example: userReducer,
+    user: userReducer,
   },
 });
 

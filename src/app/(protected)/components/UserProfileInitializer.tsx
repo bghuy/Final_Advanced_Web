@@ -3,7 +3,8 @@
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { setUserInfo } from '../../../../redux/slices/userSlice';
-import Cookies from 'js-cookie';
+import { getUserProfileFromCookie } from '../../../../actions/getUserProfileFromCookie';
+import { getUserProfile } from '../../../../actions/getUserProfile';
 export function UserProfileInitializer() {
   const dispatch = useDispatch();
 
@@ -11,18 +12,18 @@ export function UserProfileInitializer() {
     const initializeUserProfile = async () => {
       try {
         // Check for user profile in headers (set by middleware)
-        const userProfile = await Cookies.get("user_profile");
-        const userProfileHeader = JSON.parse(userProfile || "")
-        console.log(userProfileHeader,"use");
-        if (userProfileHeader) {
-          const userProfile = JSON.parse(userProfileHeader);
+        const userProfile = await getUserProfileFromCookie()
+        console.log(userProfile,"userProfile");
+        
+        if (userProfile) {
+          console.log('1');
+          
           dispatch(setUserInfo(userProfile));
         } else {
-          // If not found in headers, try to fetch it
-          const response = await fetch('/api/user-profile');
-          if (response.ok) {
-            const userProfile = await response.json();
-            dispatch(setUserInfo(userProfile));
+          console.log('2');
+          const user_data = await getUserProfile();
+          if (user_data) {
+            dispatch(setUserInfo(user_data));
           }
         }
       } catch (error) {

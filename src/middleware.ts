@@ -30,7 +30,7 @@ export async function middleware(req: NextRequest) {
         const response = NextResponse.next();
         
         // Stringify and encode the user profile data
-        const encodedUserProfile = JSON.stringify(userProfile);
+        const encodedUserProfile = encodeURIComponent(JSON.stringify(userProfile));
         
         // Set the cookie with the user profile data
         response.cookies.set('user_profile', encodedUserProfile, {
