@@ -1,28 +1,28 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface UserState {
-  value: number;
+  username: string,
+  email: string,
+  userId: string,
 }
 
 const initialState: UserState = {
-  value: 0,
+  username: '',
+  email: '',
+  userId: '',
 };
 
 const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    increment: (state) => {
-      state.value += 1;
-    },
-    decrement: (state) => {
-      state.value -= 1;
-    },
-    setValue: (state, action: PayloadAction<number>) => {
-      state.value = action.payload;
+    setUserInfo: (state, action: PayloadAction<{ username: string, email: string, userId: string }>) => {
+      state.username = action.payload.username;
+      state.email = action.payload.email;
+      state.userId = action.payload.userId;
     },
   },
 });
 
-export const { increment, decrement, setValue } = userSlice.actions;
+export const { setUserInfo } = userSlice.actions;
 export default userSlice.reducer;

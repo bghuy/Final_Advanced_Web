@@ -1,36 +1,26 @@
 'use server'
 import * as z from "zod"
 import { LoginSchema } from "@/schemas";
-// import { signIn } from "@/auth";
-// import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
-// import { AuthError } from "next-auth";
-// import { getUserByEmail } from "@/data/user";
-// import { generateVerificationToken } from "@/lib/tokens";
-// import { sendVerificationEmail } from "@/lib/mail";
-type LoginResponse = { success?: string; error?: string };
-export const login = async(values: z.infer<typeof LoginSchema>): Promise<LoginResponse> => {
+import { LoginFormResponse } from "@/types/auth/LoginFormResponse";
+import { loginService } from "@/services/auth";
+import { cookies } from 'next/headers'
+export const login = async(values: z.infer<typeof LoginSchema>): Promise<LoginFormResponse> => {
     const validatedFields = LoginSchema.safeParse(values);
     if (!validatedFields.success) {
         return({ error: "Login failed!" });
     }
-    // const {email , password } = validatedFields.data;
-    // const existingUser = await getUserByEmail(email);
-    // if(!existingUser || !existingUser?.email || !existingUser.password){
-    //     return { error: "Email does not exist!"}
-    // }
-    // if(!existingUser.emailVerified){
-    //     const verificationToken = await generateVerificationToken(existingUser.email);
-    //     await sendVerificationEmail(verificationToken.email,verificationToken.token);
-    //     return {success: "Confirmation email sent!"}
-    // }
     try {
         if (validatedFields.success) {
-            // await signIn("credentials",{
-            //     email,
-            //     password,
-            //     // redirectTo: DEFAULT_LOGIN_REDIRECT,
-            //     redirect: false
-            // })
+            const res = await loginService(values)
+            console.log(res,"res");
+            
+            if(!res?.access_token) {
+                throw new Error("Login failed!");
+            }
+            const cookieStore = await cookies();
+            cookieStore.set("access_token", res.access_token, {
+                path: "/",
+            });
             return({ success: "Login successfully!" });
         }
         else{
@@ -38,14 +28,6 @@ export const login = async(values: z.infer<typeof LoginSchema>): Promise<LoginRe
         }
     } catch (error) {
         console.log(error, "error");
-        // if(error instanceof AuthError){
-        //     switch (error.type) {
-        //         case "CredentialsSignin":
-        //             return { error: "Invalid credentials!"}
-        //         default:
-        //             return { error: "Something went wrong!"}
-        //     }
-        // }
         throw error; 
     }
 }

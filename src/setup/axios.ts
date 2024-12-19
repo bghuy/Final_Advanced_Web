@@ -1,44 +1,66 @@
-import axios from 'axios';
+import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'axios';
+import Cookies from 'js-cookie';
+import { cookies } from 'next/headers';
 
-// Tạo một instance Axios
-const axiosClient = axios.create({
-  baseURL: 'http://localhost::8080', // Thay bằng URL API của bạn
-  timeout: 20000, // Thời gian timeout (tùy chọn)
+const isServer = typeof window === 'undefined';
+
+const axiosInstance: AxiosInstance = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1',
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
   withCredentials: true,
 });
 
-// Thêm interceptor trước mỗi request để gắn token
-axiosClient.interceptors.request.use(
-  (config) => {
-    // Lấy access_token từ localStorage
-    const accessToken = localStorage.getItem('access_token');
+// Request Interceptor
+axiosInstance.interceptors.request.use(
+  async (config: InternalAxiosRequestConfig) => {
+    let token: string | undefined;
 
-    // Nếu có access_token, gắn vào Authorization header
-    if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
+    if (isServer) {
+      // Server-side: Use Next.js cookies function
+      const cookieStore = await cookies();
+      token = cookieStore.get('access_token')?.value;
+    } else {
+      // Client-side: Use js-cookie
+      token = Cookies.get('access_token');
+    }
+
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
     }
 
     return config;
   },
-  (error) => {
-    // Xử lý lỗi trước khi request được gửi
+  (error: AxiosError) => {
     return Promise.reject(error);
   }
 );
 
-// Interceptor xử lý response để chỉ trả về `data`
-axiosClient.interceptors.response.use(
+// Response Interceptor
+axiosInstance.interceptors.response.use(
   (response) => {
-    return response.data; // Trả về chỉ `data` từ response
+    // Return only the data part of the response
+    return response.data;
   },
-  (error) => {
-    // Xử lý lỗi nếu xảy ra
-    if (error.response?.status === 401) {
-      console.error('Unauthorized! Please check your access token.');
-      // Có thể thêm logic làm mới token hoặc logout
+  (error: AxiosError) => {
+    // Handle specific error cases here if needed
+    if (error.response) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx
+      console.error('Response error:', error.response.data);
+      console.error('Status:', error.response.status);
+    } else if (error.request) {
+      // The request was made but no response was received
+      console.error('Request error:', error.request);
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.error('Error:', error.message);
     }
     return Promise.reject(error);
   }
 );
 
-export default axiosClient;
+export default axiosInstance;
+
