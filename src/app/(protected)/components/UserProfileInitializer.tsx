@@ -16,11 +16,8 @@ export function UserProfileInitializer() {
         console.log(userProfile,"userProfile");
         
         if (userProfile) {
-          console.log('1');
-          
           dispatch(setUserInfo(userProfile));
         } else {
-          console.log('2');
           const user_data = await getUserProfile();
           if (user_data) {
             dispatch(setUserInfo(user_data));
