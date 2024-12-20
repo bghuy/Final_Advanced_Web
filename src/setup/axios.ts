@@ -3,31 +3,25 @@ import Cookies from 'js-cookie';
 // import { cookies } from 'next/headers';
 const isServer = typeof window === 'undefined';
 
-async function refreshToken() {
-  try {
-    console.log("1");
-    
-    const response = await axios.get('http://localhost:8080/api/v1/auth/refresh-token',{
-      withCredentials: true
-    });
-    console.log("2");
-    
-    console.log(response.data, 'response.data');
-    const newToken = response.data.access_token;
-    if (isServer) {
-      const { cookies } = await import('next/headers');
-      const cookieStore = await cookies();
-      cookieStore.set('access_token', newToken);
-    } else { 
-      Cookies.set('access_token', newToken);
-    }
-    return newToken;
-  } catch (error) {
-    console.error('Error1',error.message);
-    // console.error(error, 'Error refreshing token:');
-    throw error;
-  }
-}
+// async function refreshToken() {
+//   try {
+//     const response = await axios.get('http://localhost:8080/api/v1/auth/refresh-token',{
+//       withCredentials: true
+//     });
+//     const newToken = response.data.access_token;
+//     if (isServer) {
+//       const { cookies } = await import('next/headers');
+//       const cookieStore = await cookies();
+//       cookieStore.set('access_token', newToken);
+//     } else { 
+//       Cookies.set('access_token', newToken);
+//     }
+//     return newToken;
+//   } catch (error) {
+//     console.error('Failed to refresh token:', error);
+//     throw error; // Re-throw the error for further handling
+//   }
+// }
 
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1',
@@ -73,24 +67,26 @@ axiosInstance.interceptors.response.use(
     return response.data;
   },
   async (error: AxiosError) => {
-    if (error.response?.status === 401 && error.config) {
-      try {
-        // Refresh token and retry the original request
-        const newToken = await refreshToken();
-        error.config.headers['Authorization'] = `Bearer ${newToken}`;
-
-        // Fetch user profile and set cookie
-        // await getUserProfile();
-
-        // Retry the failed request
-        return axiosInstance.request(error.config);
-      } catch (refreshError) {
-        // console.error('Failed to refresh token:', refreshError);
-        // if (typeof window !== 'undefined') window.location.href = '/login';
-        console.log('Failed to refresh token:');
-        return Promise.reject(refreshError);
-      }
-    }
+    // if (error.response?.status === 401 && error.config) {
+    //   try {
+    //     // Refresh token and retry the original request
+    //     console.log('Refreshing token...');
+        
+    //     const newToken = await refreshToken();
+    //     if(newToken) {
+    //       error.config.headers['Authorization'] = `Bearer ${newToken}`;
+    //     }
+    //     // Fetch user profile and set cookie
+    //     // await getUserProfile();
+    //     // Retry the failed request
+    //     return axiosInstance.request(error.config);
+    //   } catch (refreshError) {
+    //     // console.error('Failed to refresh token:', refreshError);
+    //     // if (typeof window !== 'undefined') window.location.href = '/login';
+    //     console.log('Failed to refresh token:');
+    //     return Promise.reject(refreshError);
+    //   }
+    // }
     
     if (error.response) {
       console.error('Response error:', error.response.data);

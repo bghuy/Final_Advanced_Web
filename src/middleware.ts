@@ -21,9 +21,43 @@ export async function middleware(req: NextRequest) {
             return NextResponse.next();
         }
 
-        const userProfile = await GetUserProfile();
+        let userProfile = await GetUserProfile();
+        console.log(nextUrl.origin,"adsas");
+        
         if (!userProfile) {
-            return NextResponse.redirect(new URL("/auth/login", nextUrl));
+            const url = 'http://localhost:8080/api/v1/auth/refresh-token';
+            const refreshResponse = await fetch(url,{
+                method: 'GET',
+                credentials: 'include', // This ensures cookies are sent with the request
+            });
+            console.log(refreshResponse,"dsafsd");
+            
+
+            if (!refreshResponse.ok) {
+                console.error('Refresh token request failed:', refreshResponse.status, await refreshResponse.text());
+                return NextResponse.redirect(new URL("/auth/login", nextUrl));
+            }
+
+            const refreshData = await refreshResponse.json();
+            console.log('Refresh Data:', refreshData);
+
+            if (refreshData?.access_token) {
+                // Set the new access token in a cookie
+                const response = NextResponse.next();
+                response.cookies.set('access_token', refreshData.access_token, {
+                    secure: process.env.NODE_ENV === 'production',
+                    path: '/',
+                });
+
+                userProfile = await GetUserProfile();
+                if (!userProfile) {
+                    console.error('Failed to get user profile after token refresh');
+                    return NextResponse.redirect(new URL("/auth/login", nextUrl));
+                }
+            } else {
+                console.error('No access token in refresh response');
+                return NextResponse.redirect(new URL("/auth/login", nextUrl));
+            }
         }
 
         // Set user profile data in a cookie
@@ -34,7 +68,10 @@ export async function middleware(req: NextRequest) {
         
         // Set the cookie with the user profile data
         response.cookies.set('user_profile', encodedUserProfile, {
-            path: '/', // Cookie is available for all paths
+            path: '/',
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
         });
 
         return response;
