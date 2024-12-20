@@ -1,62 +1,46 @@
-
-// import { NextResponse } from 'next/server';
 import { 
     publicRoutes,
-    // apiAuthPrefix,
-    // DEFAULT_LOGIN_REDIRECT,
     authRoutes
 } from "./routes";
 import { match } from 'path-to-regexp';
-
 import { NextResponse, NextRequest } from 'next/server'; 
-import axios from 'axios'; // Import axios
+import { GetUserProfile } from "./services/user";
 
-const apiUrl = process.env.API_URL || 'https://your-api-url.com';
 export async function middleware(req: NextRequest) {
-    const { nextUrl, headers } = req;
-    const pathname = nextUrl.pathname;
-    const isPublicRoute = publicRoutes.some(route => {
-        const matcher = match(route, { decode: decodeURIComponent });
-        return matcher(pathname); // Kiểm tra xem pathname có khớp với route
-    });
-    console.log(nextUrl.pathname,"next");
-    
-    const isAuthRoute =  authRoutes.includes(nextUrl.pathname);
-
-    if (isPublicRoute || isAuthRoute) {
-        return NextResponse.next();
-    }
-
-
-    const token = headers.get('Authorization')?.split(' ')[1]; // "Bearer <token>"
-
-
-    if (!token) {
-        return NextResponse.redirect(new URL("/auth/login", nextUrl));
-    }
-
-
-    const isValidUser = await checkUserAuth(token);
-
-
-    if (!isValidUser) {
-        return NextResponse.redirect(new URL("/auth/login", nextUrl));
-    }
-    return NextResponse.next();
-}
-
-async function checkUserAuth(token: string) {
+    const { nextUrl } = req;
     try {
-        const response = await axios.post(`${apiUrl}/api/auth/verify-token`, null, {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
+        const pathname = nextUrl.pathname;
+        const isPublicRoute = publicRoutes.some(route => {
+            const matcher = match(route, { decode: decodeURIComponent });
+            return matcher(pathname); 
         });
-        return response.data.isAuthenticated;
+        
+        const isAuthRoute = authRoutes.includes(nextUrl.pathname);
+    
+        if (isPublicRoute || isAuthRoute) {
+            return NextResponse.next();
+        }
+
+        const userProfile = await GetUserProfile();
+        if (!userProfile) {
+            return NextResponse.redirect(new URL("/auth/login", nextUrl));
+        }
+
+        // Set user profile data in a cookie
+        const response = NextResponse.next();
+        
+        // Stringify and encode the user profile data
+        const encodedUserProfile = encodeURIComponent(JSON.stringify(userProfile));
+        
+        // Set the cookie with the user profile data
+        response.cookies.set('user_profile', encodedUserProfile, {
+            path: '/', // Cookie is available for all paths
+        });
+
+        return response;
     } catch (error) {
-        console.error('Error verifying user token:', error);
-        return false;
+        console.error('Middleware error:', error);
+        return NextResponse.redirect(new URL("/auth/login", nextUrl));
     }
 }
 

@@ -6,10 +6,10 @@
 export const publicRoutes = [
     "/",
     "/api/uploadthing",
-    "/tasks",
     "/task/:id",
     "/ai-recommend",
-    "/task/:id/focus-timer"
+    "/task/:id/focus-timer",
+    "/test"
 ];
 
 /**
@@ -35,5 +35,5 @@ export const apiAuthPrefix = "/api/auth";
  * The default redirect path after logging in
  * @type {string[]}
  */
-export const DEFAULT_LOGIN_REDIRECT = "/setup"
+export const DEFAULT_LOGIN_REDIRECT = "/test"
 
