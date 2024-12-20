@@ -1,15 +1,15 @@
 import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 import Cookies from 'js-cookie';
-import { cookies } from 'next/headers';
+// import { cookies } from 'next/headers';
 
 const isServer = typeof window === 'undefined';
 
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1',
   timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  // headers: {
+  //   'Content-Type': 'application/json',
+  // },
   withCredentials: true,
 });
 
@@ -19,6 +19,7 @@ axiosInstance.interceptors.request.use(
     let token: string | undefined;
 
     if (isServer) {
+      const { cookies } = await import('next/headers');
       // Server-side: Use Next.js cookies function
       const cookieStore = await cookies();
       token = cookieStore.get('access_token')?.value;
@@ -41,6 +42,8 @@ axiosInstance.interceptors.request.use(
 // Response Interceptor
 axiosInstance.interceptors.response.use(
   (response) => {
+    console.log('Response:', response.headers);
+    
     // Return only the data part of the response
     return response.data;
   },
