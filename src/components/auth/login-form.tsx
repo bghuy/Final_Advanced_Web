@@ -25,6 +25,7 @@ import { useSearchParams } from "next/navigation"
 // import { setUserInfo } from "../../../redux/slices/userSlice"
 export const LoginForm = () =>{
     const searchParams = useSearchParams();
+    const redirect_url = searchParams.get("redirect_url") || "/"
     const urlError = searchParams.get("error") === "OAuthAccountNotLinked"
         ? "Email already in use with different provider!"
         : ""
@@ -51,11 +52,12 @@ export const LoginForm = () =>{
             }
         })
     }
+    const backButtonHref = `/auth/register?redirect_url=${encodeURIComponent(redirect_url)}`;
     return (
         <CardWrapper
             headerLabel="Welcome back"
             backButtonLabel="Don't have an account"
-            backButtonHref="/auth/register"
+            backButtonHref={backButtonHref}
             showSocial
         >
             <Form {...form}>

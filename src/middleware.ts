@@ -9,6 +9,7 @@ import axios from "axios"
 import jwt from 'jsonwebtoken';
 export async function middleware(req: NextRequest) {
     const { nextUrl } = req;
+    const redirect_url = nextUrl?.pathname || null
     try {
         const pathname = nextUrl.pathname;
         const isPublicRoute = publicRoutes.some(route => {
@@ -69,7 +70,11 @@ export async function middleware(req: NextRequest) {
 
         return response;
     } catch (error) {
+        if(redirect_url){
+            return NextResponse.redirect(new URL(`/auth/login?redirect_url=${redirect_url}`, nextUrl));
+        }
         return NextResponse.redirect(new URL("/auth/login", nextUrl));
+        
     }
 }
 
