@@ -23,7 +23,7 @@ export const RegisterSchema = z.object({
     }).refine(value => !/\s/.test(value), {
         message: "Password cannot contain spaces",
     }),
-    name: z.string().min(1,{
+    username: z.string().min(1,{
         message: "Name is required"
     })
 

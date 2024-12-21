@@ -18,17 +18,19 @@ import { FormError } from "@/components/form-error"
 import { FormSuccess } from "@/components/form-success"
 import { useState, useTransition } from "react"
 import { register } from "../../../actions/register"
-
+import { useRouter } from "next/navigation";
+import { DEFAULT_LOGIN_REDIRECT } from "@/routes"
 export const RegisterForm = () =>{
     const [isPending,startTransition] = useTransition();
     const [error,setError] = useState<string | undefined>("");
     const [success,setSuccess] = useState<string | undefined>("")
+    const router = useRouter();
     const form = useForm<z.infer<typeof RegisterSchema>>({
         resolver: zodResolver(RegisterSchema),
         defaultValues: {
             email: "",
             password: "",
-            name: ""
+            username: ""
         },
     });
     const submitForm = async (values: z.infer<typeof RegisterSchema>) => {
@@ -41,10 +43,11 @@ export const RegisterForm = () =>{
                     setError(data.error);
                 } else {
                     setSuccess(data.success);
+                    router.push(DEFAULT_LOGIN_REDIRECT);
                 }
             } catch (err) {
                 console.log(err);
-                setError("Something went wrong!");
+                setError("An error occurred. Please try again later.");
             }
         });
     };
@@ -64,10 +67,10 @@ export const RegisterForm = () =>{
                     <div className="space-y-4">
                         <FormField
                             control={form.control}
-                            name="name"
+                            name="username"
                             render={({field})=>(
                                 <FormItem>
-                                    <FormLabel>Name</FormLabel>
+                                    <FormLabel>UserName</FormLabel>
                                     <FormControl>
                                         <Input
                                             {...field}

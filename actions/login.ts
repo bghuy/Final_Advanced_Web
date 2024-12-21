@@ -17,16 +17,11 @@ export const login = async(values: z.infer<typeof LoginSchema>): Promise<LoginFo
             return({ error: "Login failed. Please check your credentials." });
         }
         const decodedToken = jwt.decode(res.access_token) as jwt.JwtPayload;
-        const expirationTime = decodedToken?.exp || Math.floor(Date.now() / 1000) + 3600; // 1 hour
-        
-        // Calculate expiration in days for js-cookie
-        const expirationInDays = (expirationTime - Math.floor(Date.now() / 1000)) / (60 * 60 * 24);
+        const expirationTime = decodedToken?.exp ? new Date(decodedToken?.exp * 1000) : Math.floor(Date.now() / 1000) + 3600; // 1 hour
         
         Cookies.set("access_token", res.access_token, {
             path: "/",
-            expires: expirationInDays,
-            secure: process.env.NODE_ENV === 'production', // Use secure in production
-            sameSite: 'strict'
+            expires: expirationTime,
         });
         return({ success: "Login successful!" });
     } catch (error) {
