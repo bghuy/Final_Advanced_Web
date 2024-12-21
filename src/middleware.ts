@@ -6,6 +6,7 @@ import { match } from 'path-to-regexp';
 import { NextResponse, NextRequest } from 'next/server'; 
 import { GetUserProfile } from "./services/user";
 import axios from "axios"
+import jwt from 'jsonwebtoken';
 export async function middleware(req: NextRequest) {
     const { nextUrl } = req;
     try {
@@ -32,10 +33,16 @@ export async function middleware(req: NextRequest) {
             });
             const accessToken = refreshResponse.data.data?.access_token;
             if (accessToken) {
+                const decodedToken = jwt.decode(accessToken) as jwt.JwtPayload;
+                const expirationTime = decodedToken?.exp ? new Date(decodedToken?.exp * 1000) : Math.floor(Date.now() / 1000) + 3600; // 1 hour
+                
                 // Set the new access token in a cookie
                 response.cookies.set('access_token', accessToken, {
                     path: '/',
+                    expires: expirationTime,
                 });
+                console.log("done");
+                
                 const userProfileResponse = await axios.get('http://localhost:8080/api/v1/auth/profile', {
                     headers: {
                         Authorization: `Bearer ${accessToken || ''}`,
