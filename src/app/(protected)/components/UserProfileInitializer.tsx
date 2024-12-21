@@ -24,7 +24,7 @@ export function UserProfileInitializer() {
           }
         }
       } catch (error) {
-        console.error('Error initializing user profile:', error);
+        console.log('Error initializing user profile:', error);
       }
     };
 

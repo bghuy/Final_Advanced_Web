@@ -2,7 +2,6 @@ import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'ax
 import Cookies from 'js-cookie';
 // import { cookies } from 'next/headers';
 const isServer = typeof window === 'undefined';
-
 // async function refreshToken() {
 //   try {
 //     const response = await axios.get('http://localhost:8080/api/v1/auth/refresh-token',{
@@ -42,9 +41,13 @@ axiosInstance.interceptors.request.use(
       // Server-side: Use Next.js cookies function
       const cookieStore = await cookies();
       token = cookieStore.get('access_token')?.value;
+      const refresh = cookieStore.get('refresh_token')?.value;
+      console.log(refresh,"refresh");
     } else {
       // Client-side: Use js-cookie
       token = Cookies.get('access_token');
+      const refresh = Cookies.get('refresh_token');
+      console.log(refresh,"refresh");
     }
 
     if (token) {
