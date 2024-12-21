@@ -30,7 +30,6 @@ export const login = async(values: z.infer<typeof LoginSchema>): Promise<LoginFo
         });
         return({ success: "Login successful!" });
     } catch (error) {
-        console.error("Login error:", error);
         return({ error: "An unexpected error occurred. Please try again." });
     }
 }

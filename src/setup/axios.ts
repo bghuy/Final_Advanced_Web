@@ -41,13 +41,9 @@ axiosInstance.interceptors.request.use(
       // Server-side: Use Next.js cookies function
       const cookieStore = await cookies();
       token = cookieStore.get('access_token')?.value;
-      const refresh = cookieStore.get('refresh_token')?.value;
-      console.log(refresh,"refresh");
     } else {
       // Client-side: Use js-cookie
       token = Cookies.get('access_token');
-      const refresh = Cookies.get('refresh_token');
-      console.log(refresh,"refresh");
     }
 
     if (token) {
@@ -59,7 +55,7 @@ axiosInstance.interceptors.request.use(
   (error: AxiosError) => {
     return Promise.reject(error);
   }
-);
+)
 
 // Response Interceptor
 axiosInstance.interceptors.response.use(
@@ -70,35 +66,14 @@ axiosInstance.interceptors.response.use(
     return response.data;
   },
   async (error: AxiosError) => {
-    // if (error.response?.status === 401 && error.config) {
-    //   try {
-    //     // Refresh token and retry the original request
-    //     console.log('Refreshing token...');
-        
-    //     const newToken = await refreshToken();
-    //     if(newToken) {
-    //       error.config.headers['Authorization'] = `Bearer ${newToken}`;
-    //     }
-    //     // Fetch user profile and set cookie
-    //     // await getUserProfile();
-    //     // Retry the failed request
-    //     return axiosInstance.request(error.config);
-    //   } catch (refreshError) {
-    //     // console.error('Failed to refresh token:', refreshError);
-    //     // if (typeof window !== 'undefined') window.location.href = '/login';
-    //     console.log('Failed to refresh token:');
-    //     return Promise.reject(refreshError);
-    //   }
+    // if (error.response) {
+    //   console.error('Response error:', error.response.data);
+    //   console.error('Status:', error.response.status);
+    // } else if (error.request) {
+    //   console.error('Request error:', error.request);
+    // } else {
+    //   console.error('Error:', error.message);
     // }
-    
-    if (error.response) {
-      console.error('Response error:', error.response.data);
-      console.error('Status:', error.response.status);
-    } else if (error.request) {
-      console.error('Request error:', error.request);
-    } else {
-      console.error('Error:', error.message);
-    }
     return Promise.reject(error);
   }
 );

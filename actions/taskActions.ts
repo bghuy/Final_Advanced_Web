@@ -67,7 +67,6 @@ export async function getTasks(): Promise<Task[]> {
     await new Promise(resolve => setTimeout(resolve, 1000))
     return tasks
   } catch (error) {
-    console.error("Failed to fetch tasks:", error)
     throw new Error("Failed to fetch tasks. Please try again later.")
   }
 }
@@ -86,7 +85,6 @@ export async function editTask(updatedTask: Task): Promise<Task> {
     tasks[index] = updatedTask
     return updatedTask
   } catch (error) {
-    console.error("Failed to edit task:", error)
     throw new Error("Failed to edit task. Please try again later.")
   }
 }
@@ -103,7 +101,6 @@ export async function deleteTask(taskId: string): Promise<void> {
     
     tasks.splice(index, 1)
   } catch (error) {
-    console.error("Failed to delete task:", error)
     throw new Error("Failed to delete task. Please try again later.")
   }
 }
@@ -125,7 +122,6 @@ export async function createTask(newTask: Omit<Task, 'id' | 'created_at' | 'upda
     tasks.push(task)
     return task
   } catch (error) {
-    console.error("Failed to create task:", error)
     throw new Error("Failed to create task. Please try again later.")
   }
 }

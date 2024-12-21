@@ -45,7 +45,6 @@ export const register = async(values: z.infer<typeof RegisterSchema>): Promise<R
         // await sendVerificationEmail(verificationToken.email, verificationToken.token)
         return { success: "Confirmation email sent!" };
     } catch (error) {
-        console.error("Registration error:", error);
         return { error: "Register failed!" };
     }
 };
