@@ -1,55 +1,75 @@
-
-// import { NextResponse } from 'next/server';
 import { 
     publicRoutes,
-    // apiAuthPrefix,
-    // DEFAULT_LOGIN_REDIRECT,
     authRoutes
 } from "./routes";
-
+import { match } from 'path-to-regexp';
 import { NextResponse, NextRequest } from 'next/server'; 
-import axios from 'axios'; // Import axios
-
-const apiUrl = process.env.API_URL || 'https://your-api-url.com';
+import { GetUserProfile } from "./services/user";
+import axios from "axios"
+import jwt from 'jsonwebtoken';
 export async function middleware(req: NextRequest) {
-    const { nextUrl, headers } = req;
-    const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
-    const isAuthRoute =  authRoutes.includes(nextUrl.pathname);
-
-    if (isPublicRoute || isAuthRoute) {
-        return NextResponse.next();
-    }
-
-
-    const token = headers.get('Authorization')?.split(' ')[1]; // "Bearer <token>"
-
-
-    if (!token) {
-        return NextResponse.redirect(new URL("/auth/login", nextUrl));
-    }
-
-
-    const isValidUser = await checkUserAuth(token);
-
-
-    if (!isValidUser) {
-        return NextResponse.redirect(new URL("/auth/login", nextUrl));
-    }
-    return NextResponse.next();
-}
-
-async function checkUserAuth(token: string) {
+    const { nextUrl } = req;
     try {
-        const response = await axios.post(`${apiUrl}/api/auth/verify-token`, null, {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
+        const pathname = nextUrl.pathname;
+        const isPublicRoute = publicRoutes.some(route => {
+            const matcher = match(route, { decode: decodeURIComponent });
+            return matcher(pathname); 
         });
-        return response.data.isAuthenticated;
+        
+        const isAuthRoute = authRoutes.includes(nextUrl.pathname);
+    
+        if (isPublicRoute || isAuthRoute) {
+            return NextResponse.next();
+        }
+
+        let userProfile = await GetUserProfile();
+        const response = NextResponse.next();
+        if (!userProfile) {
+            const refreshResponse = await axios.get('http://localhost:8080/api/v1/auth/refresh-token', {
+                headers: {
+                    Cookie: `refresh_token=${req.cookies?.get('refresh_token')?.value || ''}`
+                },
+                withCredentials: true,
+            });
+            const accessToken = refreshResponse.data.data?.access_token;
+            if (accessToken) {
+                const decodedToken = jwt.decode(accessToken) as jwt.JwtPayload;
+                const expirationTime = decodedToken?.exp ? new Date(decodedToken?.exp * 1000) : Math.floor(Date.now() / 1000) + 3600; // 1 hour
+                
+                // Set the new access token in a cookie
+                response.cookies.set('access_token', accessToken, {
+                    path: '/',
+                    expires: expirationTime,
+                });
+                console.log("done");
+                
+                const userProfileResponse = await axios.get('http://localhost:8080/api/v1/auth/profile', {
+                    headers: {
+                        Authorization: `Bearer ${accessToken || ''}`,
+                    },
+                    withCredentials: true,
+                });
+                userProfile = userProfileResponse?.data?.data || null;
+                if(!userProfile){
+                    return NextResponse.redirect(new URL("/auth/login", nextUrl));
+                }
+            } else {
+                return NextResponse.redirect(new URL("/auth/login", nextUrl));
+            }
+        }
+
+        // Set the cookie with the user profile data
+        const encodedUserProfile = encodeURIComponent(JSON.stringify(userProfile));
+        response.cookies.set('user_profile', encodedUserProfile, {
+            path: '/',
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+        });
+
+        return response;
     } catch (error) {
-        console.error('Error verifying user token:', error);
-        return false;
+        return NextResponse.redirect(new URL("/auth/login", nextUrl));
     }
 }
 

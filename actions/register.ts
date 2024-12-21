@@ -1,13 +1,10 @@
-'use server'
+'use client'
 import * as z from "zod";
 import { RegisterSchema } from "@/schemas";
-// import bcrypt from "bcryptjs";
-// import { db } from "@/lib/db";
-// import { getUserByEmail } from "@/data/user";
-// import { generateVerificationToken } from "@/lib/tokens";
-// import { sendVerificationEmail } from "@/lib/mail";
-
-
+import { registerService } from "@/services/auth";
+import jwt from 'jsonwebtoken';
+import Cookies from 'js-cookie';
+import { AxiosError } from "axios";
 type RegisterResponse = { success?: string; error?: string };
 
 export const register = async(values: z.infer<typeof RegisterSchema>): Promise<RegisterResponse> => {
@@ -17,35 +14,28 @@ export const register = async(values: z.infer<typeof RegisterSchema>): Promise<R
     if (!validatedFields.success) {
         return { error: "Register failed!" };
     }
-
-    // const { email, password, name } = validatedFields.data;
-
     try {
-        // Hash the password
-        // const hashedPassword = await bcrypt.hash(password, 10);
-
-        // Check if the user already exists
-        // const existingUser = await getUserByEmail(email);
-
-        // if (existingUser) {
-        //     return { error: "Email already in use!" };
-        // }
-
-        // Create a new user
-        // await db.user.create({
-        //     data: {
-        //         name,
-        //         email,
-        //         password: hashedPassword
-        //     }
-        // });
-
-        // TODO: Send verification token email
-        // const verificationToken = await generateVerificationToken(email);
-        // await sendVerificationEmail(verificationToken.email, verificationToken.token)
-        return { success: "Confirmation email sent!" };
+        const res = await registerService(values)
+        const decodedToken = jwt.decode(res.access_token) as jwt.JwtPayload;
+        const expirationTime = decodedToken?.exp || Math.floor(Date.now() / 1000) + 3600; // 1 hour
+        
+        // Calculate expiration in days for js-cookie
+        const expirationInDays = (expirationTime - Math.floor(Date.now() / 1000)) / (60 * 60 * 24);
+        
+        Cookies.set("access_token", res.access_token, {
+            path: "/",
+            expires: expirationInDays,
+            secure: process.env.NODE_ENV === 'production', // Use secure in production
+            sameSite: 'strict'
+        });
+        return { success: "Register successful!" };
     } catch (error) {
-        console.error("Registration error:", error);
-        return { error: "Register failed!" };
+        if (error instanceof AxiosError) {
+            console.log("Register failed!", error);
+            return { error: error.response?.data?.message || "Register failed!" };
+        }
+
+        console.log("Unexpected error!", error);
+        return { error: "An unexpected error occurred!" };
     }
 };
