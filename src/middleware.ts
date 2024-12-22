@@ -69,6 +69,8 @@ export async function middleware(req: NextRequest) {
 
         return response;
     } catch (error) {
+        console.log(error);
+        
         return NextResponse.redirect(new URL("/auth/login", nextUrl));
         
     }

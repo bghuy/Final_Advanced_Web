@@ -126,17 +126,32 @@ export function TaskTable() {
       (priorityFilter === 'all' || task.priority === priorityFilter)
     )
 
-    if (sortConfig) {
+    if (sortConfig && sortConfig.key && sortConfig.direction) {
+      const key = sortConfig.key;
       result.sort((a, b) => {
-        if (a[sortConfig.key] < b[sortConfig.key]) {
-          return sortConfig.direction === 'asc' ? -1 : 1;
+        const valueA = a[key];
+        const valueB = b[key];
+    
+        // Kiểm tra giá trị không phải là undefined trước khi so sánh
+        if (valueA !== undefined && valueB !== undefined) {
+          if (valueA < valueB) {
+            return sortConfig.direction === 'asc' ? -1 : 1;
+          }
+          if (valueA > valueB) {
+            return sortConfig.direction === 'asc' ? 1 : -1;
+          }
         }
-        if (a[sortConfig.key] > b[sortConfig.key]) {
-          return sortConfig.direction === 'asc' ? 1 : -1;
-        }
+    
+        // Trường hợp giá trị undefined được xem là nhỏ nhất
+        if (valueA === undefined) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (valueB === undefined) return sortConfig.direction === 'asc' ? 1 : -1;
+    
         return 0;
-      })
+      });
     }
+    
+    
+    
 
     return result
   }, [tasks, searchTerm, sortConfig, statusFilter, priorityFilter])
