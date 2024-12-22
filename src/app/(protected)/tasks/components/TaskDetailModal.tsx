@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Task } from "@/types/task"
 import { Edit, Trash2, Loader2 } from 'lucide-react'
@@ -16,7 +16,7 @@ interface TaskDetailModalProps {
   onOpenEditModal: () => void;
 }
 
-export function TaskDetailModal({ task, isOpen, onClose, onEdit, onDelete, isLoading, onOpenEditModal }: TaskDetailModalProps) {
+export function TaskDetailModal({ task, isOpen, onClose, onDelete, isLoading, onOpenEditModal }: TaskDetailModalProps) {
   //const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
   if (!task) return null;

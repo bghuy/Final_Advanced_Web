@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import { getTasks, editTask } from '../../../../../../actions/taskActions'
 import { Task } from '@/types/task'
 import { Button } from "@/components/ui/button"
@@ -19,7 +18,6 @@ export default function FocusTimerPage({ params }: { params: Promise<{ id: strin
   const [isRunning, setIsRunning] = useState(false)
   const [isBreak, setIsBreak] = useState(false)
   const [taskId, setTaskId] = useState<string | null>(null) // Store resolved ID here
-  const router = useRouter()
   const { toast } = useToast()
 
   // Resolve `params` and set `taskId`

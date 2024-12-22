@@ -79,6 +79,7 @@ export default function TaskPage() {
         description: "The task has been successfully updated.",
       })
     } catch (error) {
+      console.log(error);
       toast({
         title: "Error",
         description: "Failed to update the task. Please try again.",
@@ -97,6 +98,7 @@ export default function TaskPage() {
       })
       router.push('/')
     } catch (error) {
+      console.log(error);
       toast({
         title: "Error",
         description: "Failed to delete the task. Please try again.",

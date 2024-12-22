@@ -60,6 +60,7 @@ export function TaskTable() {
         setTasks(fetchedTasks)
         setLoading(false)
       } catch (err) {
+        console.log(err);
         setError("Failed to fetch data. Please try again later.")
         setLoading(false)
       }
@@ -106,7 +107,7 @@ export function TaskTable() {
     }
   }
 
-  const handleSort = (key: string) => {
+  const handleSort = (key: keyof Task) => {
     setSortConfig((prevConfig) => {
       if (prevConfig && prevConfig.key === key) {
         if (prevConfig.direction === 'asc') {
@@ -151,6 +152,7 @@ export function TaskTable() {
           description: "The new task has been successfully added.",
         })
       } catch (error) {
+        console.log(error);
         toast({
           title: "Error",
           description: "Failed to add the task. Please try again.",
@@ -171,6 +173,7 @@ export function TaskTable() {
           description: "The task has been successfully updated.",
         })
       } catch (error) {
+        console.log(error);
         toast({
           title: "Error",
           description: "Failed to update the task. Please try again.",
@@ -191,6 +194,7 @@ export function TaskTable() {
           description: "The task has been successfully deleted.",
         })
       } catch (error) {
+        console.log(error);
         toast({
           title: "Error",
           description: "Failed to delete the task. Please try again.",
@@ -201,10 +205,12 @@ export function TaskTable() {
   }
 
   const handleToggleColumn = (key: string) => {
-    setColumns(columns.map(column => 
+  setColumns((prevColumns) =>
+    prevColumns.map((column) =>
       column.key === key ? { ...column, isVisible: !column.isVisible } : column
-    ))
-  }
+    )
+  );
+};
 
   const handleAnalyzeTask = (task: Task) => {
     // Implement task analysis logic here
@@ -275,7 +281,7 @@ export function TaskTable() {
             {columns.map(column => column.isVisible && (
               <TableHead 
                 key={column.key} 
-                onClick={() => handleSort(column.key)} 
+                onClick={() => handleSort(column.key as keyof Task)} 
                 className="cursor-pointer"
               >
                 <div className="flex items-center">
