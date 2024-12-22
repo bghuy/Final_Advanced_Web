@@ -32,7 +32,7 @@ export default function RootLayout({
         style={{height: "100vh"}}
       >
         <ReduxProvider>
-          <Navbar/>
+          {/* <Navbar/> */}
           {children}
         </ReduxProvider>
       </body>
