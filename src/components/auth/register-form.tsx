@@ -20,10 +20,8 @@ import { useState, useTransition } from "react"
 import { register } from "../../../actions/register"
 import { useRouter } from "next/navigation";
 import { DEFAULT_LOGIN_REDIRECT } from "@/routes"
-import { useSearchParams } from "next/navigation"
+// import { useSearchParams } from "next/navigation"
 export const RegisterForm = () =>{
-    const searchParams = useSearchParams();
-    const redirect_url = searchParams.get("redirect_url") || "/"
     const [isPending,startTransition] = useTransition();
     const [error,setError] = useState<string | undefined>("");
     const [success,setSuccess] = useState<string | undefined>("")
@@ -54,7 +52,7 @@ export const RegisterForm = () =>{
             }
         });
     };
-    const backButtonHref = `/auth/login?redirect_url=${encodeURIComponent(redirect_url)}`;
+    const backButtonHref = `/auth/login`;
     return (
         <CardWrapper
             headerLabel="Create an account"

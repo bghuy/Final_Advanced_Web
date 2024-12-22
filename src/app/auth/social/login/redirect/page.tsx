@@ -10,7 +10,6 @@ import { useEffect } from "react";
 const SocialLoginPage = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const redirect_url = searchParams.get("redirect_url") || "/";
     const access_token = searchParams.get("access_token") || null;
 
     useEffect(() => {
@@ -33,7 +32,7 @@ const SocialLoginPage = () => {
                     const userProfile = await GetUserProfile();
                     // Redirect if profile fetch is successful
                     if (userProfile) {
-                        router.push(redirect_url);
+                        router.push("/");
                     } else {
                         router.push("/auth/login");
                     }
@@ -47,7 +46,7 @@ const SocialLoginPage = () => {
         };
 
         handleSocialLogin();
-    }, [access_token, redirect_url, router]);
+    }, [access_token, router]);
 
     return null;
 };
