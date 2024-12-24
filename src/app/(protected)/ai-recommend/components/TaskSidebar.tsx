@@ -40,7 +40,7 @@ export default function TaskSidebar({ tasks, loading }: TaskSidebarProps) {
                   <Badge className={getBadgeClassName(task.priority)}>
                     {task.priority}
                   </Badge>
-                  <span className="text-xs text-gray-500">Due: {new Date(task.deadline).toLocaleDateString()}</span>
+                  <span className="text-xs text-gray-500">Due: {new Date(task.deadline as string).toLocaleDateString()}</span>
                 </div>
               </Link>
             </li>

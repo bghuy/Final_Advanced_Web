@@ -122,7 +122,7 @@ export default function TaskPage() {
           <label className="block text-gray-700 text-sm font-bold mb-2">
             Deadline
           </label>
-          <p className="text-gray-700 text-base">{new Date(task.deadline).toLocaleDateString()}</p>
+          <p className="text-gray-700 text-base">{new Date(task.deadline as string).toLocaleDateString()}</p>
         </div>
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2">
@@ -156,7 +156,7 @@ export default function TaskPage() {
           <label className="block text-gray-700 text-sm font-bold mb-2">
             Focus Sessions
           </label>
-          <p className="text-gray-700 text-base">{task.focusSessions}</p>
+          {/* <p className="text-gray-700 text-base">{task.focusSessions}</p> */}
         </div>
         <div className="flex justify-end space-x-2 mt-4">
           <Button variant="outline" onClick={() => setIsEditModalOpen(true)}>

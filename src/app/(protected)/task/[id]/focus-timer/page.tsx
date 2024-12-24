@@ -94,7 +94,7 @@ export default function FocusTimerPage({ params }: { params: Promise<{ id: strin
     if (!isBreak && task) {
       const updatedTask = {
         ...task,
-        focusSessions: (task.focusSessions || 0) + 1,
+        // focusSessions: (task.focusSessions || 0) + 1,
       }
       await editTask(updatedTask)
       setTask(updatedTask)

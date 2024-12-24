@@ -157,7 +157,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({ chatMode }) => {
     }
   }
 
-  const handleSort = (key: string) => {
+  const handleSort = (key: keyof Task) => {
     setSortConfig((prevConfig) => {
       if (prevConfig && prevConfig.key === key) {
         if (prevConfig.direction === 'asc') {
@@ -386,7 +386,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({ chatMode }) => {
               <TableHead 
                 key={column.key} 
                 className="cursor-pointer"
-                onClick={() => handleSort(column.key)}
+                onClick={() => handleSort(column.key as keyof Task)}
               >
                 <div className="flex items-center">
                   {column.label}

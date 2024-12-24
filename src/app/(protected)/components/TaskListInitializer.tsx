@@ -2,7 +2,6 @@
 
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { setTaskList } from '../../../../redux/slices/taskSlice';
 import { getTaskList } from '../../../../actions/Task/getTaskList';
 import { ISODateString } from '@/types/ISODateString';
 export function TaskListInitializer() {
