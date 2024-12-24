@@ -18,19 +18,29 @@ interface EditTaskModalProps {
 }
 
 export function EditTaskModal({ task, isOpen, onClose, onUpdateTask, isLoading }: EditTaskModalProps) {
-  const { control, handleSubmit, reset, formState: { errors, isValid } } = useForm<Task>({
+  const { control, handleSubmit, reset, watch, formState: { errors, isValid } } = useForm<Task>({
     defaultValues: task || {},
     mode: 'onChange'
   })
 
+  const status = watch('status')
+
   useEffect(() => {
     if (task) {
-      reset(task)
+      reset({
+        ...task,
+        start_time: task.start_time?.slice(0, 16) || '',
+        end_time: task.end_time?.slice(0, 16) || '',
+        deadline: task.deadline?.slice(0, 16) || '',
+      })
     }
   }, [task, reset])
 
   const onSubmit = (data: Task) => {
     if (task) {
+      if (data.status === 'Todo' && !data.deadline) {
+        delete data.deadline;
+      }
       onUpdateTask({ ...task, ...data, updated_at: new Date().toISOString() })
     }
   }
@@ -69,20 +79,6 @@ export function EditTaskModal({ task, isOpen, onClose, onUpdateTask, isLoading }
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="edit-deadline" className="text-right">
-              Deadline
-            </Label>
-            <div className="col-span-3">
-              <Controller
-                name="deadline"
-                control={control}
-                rules={{ required: "Deadline is required" }}
-                render={({ field }) => <Input {...field} id="edit-deadline" type="date" />}
-              />
-              {errors.deadline && <p className="text-sm text-red-500 mt-1">{errors.deadline.message}</p>}
-            </div>
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="edit-status" className="text-right">
               Status
             </Label>
@@ -106,6 +102,44 @@ export function EditTaskModal({ task, isOpen, onClose, onUpdateTask, isLoading }
                 )}
               />
               {errors.status && <p className="text-sm text-red-500 mt-1">{errors.status.message}</p>}
+            </div>
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="edit-start_time" className="text-right">
+              Start Time
+            </Label>
+            <div className="col-span-3">
+              <Controller
+                name="start_time"
+                control={control}
+                render={({ field }) => <Input {...field} id="edit-start_time" type="datetime-local" />}
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="edit-end_time" className="text-right">
+              End Time
+            </Label>
+            <div className="col-span-3">
+              <Controller
+                name="end_time"
+                control={control}
+                render={({ field }) => <Input {...field} id="edit-end_time" type="datetime-local" />}
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="edit-deadline" className="text-right">
+              Deadline
+            </Label>
+            <div className="col-span-3">
+              <Controller
+                name="deadline"
+                control={control}
+                rules={{ required: status !== 'Todo' ? "Deadline is required" : false }}
+                render={({ field }) => <Input {...field} id="edit-deadline" type="datetime-local" />}
+              />
+              {errors.deadline && <p className="text-sm text-red-500 mt-1">{errors.deadline.message}</p>}
             </div>
           </div>
           <div className="grid grid-cols-4 items-center gap-4">

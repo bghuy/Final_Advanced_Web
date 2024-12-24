@@ -2,135 +2,118 @@
 
 import { Task } from "@/types/task"
 import { v4 as uuidv4 } from 'uuid'
+import { revalidatePath } from 'next/cache'
 
 const tasks: Task[] = [
   {
     id: "1",
     title: "Complete project proposal",
     description: "Draft and finalize the project proposal for the new client",
-    deadline: "2023-12-31",
+    start_time: "2023-12-31T09:00:00",
+    end_time: "2023-12-31T23:59:00",
+    deadline: "2023-12-31T23:59:00",
     status: "In Progress",
     priority: "high",
     created_at: "2023-11-15T09:00:00Z",
     updated_at: "2023-11-15T09:00:00Z",
-    focusSessions: 0,
   },
   {
     id: "2",
     title: "Review code changes",
     description: "Review and approve the latest pull requests",
-    deadline: "2023-12-20",
+    start_time: "2023-12-20T10:00:00",
+    end_time: "2023-12-20T18:00:00",
     status: "Todo",
     priority: "medium",
     created_at: "2023-11-16T10:30:00Z",
     updated_at: "2023-11-16T10:30:00Z",
-    focusSessions: 0,
+    deadline: "2023-12-31T23:59:00"
   },
   {
     id: "3",
     title: "Update documentation",
     description: "Update the user guide with the latest features",
-    deadline: "2023-12-25",
+    start_time: "2023-12-25T09:00:00",
+    end_time: "2023-12-25T12:00:00",
     status: "Completed",
     priority: "low",
     created_at: "2023-11-17T11:45:00Z",
     updated_at: "2023-11-18T14:20:00Z",
-    focusSessions: 2,
+    deadline: "2023-12-31T23:59:00"
   },
   {
     id: "4",
     title: "Prepare presentation",
     description: "Create slides for the upcoming team meeting",
-    deadline: "2023-12-22",
+    start_time: "2023-12-22T13:00:00",
+    end_time: "2023-12-22T15:30:00",
     status: "In Progress",
     priority: "medium",
     created_at: "2023-11-18T13:15:00Z",
     updated_at: "2023-11-18T13:15:00Z",
-    focusSessions: 1,
   },
   {
     id: "5",
     title: "Debug reported issues",
     description: "Investigate and fix bugs reported by QA team",
-    deadline: "2023-12-18",
+    start_time: "2023-12-18T09:00:00",
+    end_time: "2023-12-18T17:00:00",
     status: "Expired",
     priority: "high",
     created_at: "2023-11-19T09:30:00Z",
     updated_at: "2023-11-20T11:45:00Z",
-    focusSessions: 0,
+    deadline: "2023-12-31T23:59:00"
   }
 ]
 
 export async function getTasks(): Promise<Task[]> {
-  try {
-    // Simulating API delay
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    return tasks
-  } catch (error) {
-    console.log(error);
-    
-    throw new Error("Failed to fetch tasks. Please try again later.")
-  }
+  // Simulating API delay
+  await new Promise(resolve => setTimeout(resolve, 1000))
+  return tasks
 }
 
 export async function editTask(updatedTask: Task): Promise<Task> {
-  try {
-    // Simulating API delay
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    const index = tasks.findIndex(task => task.id === updatedTask.id)
-    if (index === -1) {
-      throw new Error("Task not found")
-    }
-    
-    updatedTask.updated_at = new Date().toISOString()
-    tasks[index] = updatedTask
-    return updatedTask
-  } catch (error) {
-    console.log(error);
-    
-    throw new Error("Failed to edit task. Please try again later.")
+  // Simulating API delay
+  await new Promise(resolve => setTimeout(resolve, 1000))
+  
+  const index = tasks.findIndex(task => task.id === updatedTask.id)
+  if (index === -1) {
+    throw new Error("Task not found")
   }
+  
+  updatedTask.updated_at = new Date().toISOString()
+  tasks[index] = updatedTask
+  revalidatePath('/') // Revalidate the home page
+  return updatedTask
 }
 
 export async function deleteTask(taskId: string): Promise<void> {
-  try {
-    // Simulating API delay
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    const index = tasks.findIndex(task => task.id === taskId)
-    if (index === -1) {
-      throw new Error("Task not found")
-    }
-    
-    tasks.splice(index, 1)
-  } catch (error) {
-    console.log(error);
-    
-    throw new Error("Failed to delete task. Please try again later.")
+  // Simulating API delay
+  await new Promise(resolve => setTimeout(resolve, 1000))
+  
+  const index = tasks.findIndex(task => task.id === taskId)
+  if (index === -1) {
+    throw new Error("Task not found")
   }
+  
+  tasks.splice(index, 1)
+  revalidatePath('/') // Revalidate the home page
 }
 
-export async function createTask(newTask: Omit<Task, 'id' | 'created_at' | 'updated_at' | 'focusSessions'>): Promise<Task> {
-  try {
-    // Simulating API delay
-    await new Promise(resolve => setTimeout(resolve, 1000))
+export async function createTask(newTask: Omit<Task, 'id' | 'created_at' | 'updated_at'>): Promise<Task> {
+  // Simulating API delay
+  await new Promise(resolve => setTimeout(resolve, 1000))
 
-    const now = new Date().toISOString()
-    const task: Task = {
-      ...newTask,
-      id: uuidv4(), // Generate a unique ID using uuid
-      created_at: now,
-      updated_at: now,
-      focusSessions: 0,
-    }
-
-    tasks.push(task)
-    return task
-  } catch (error) {
-    console.log(error);
-    
-    throw new Error("Failed to create task. Please try again later.")
+  const now = new Date().toISOString()
+  const task: Task = {
+    ...newTask,
+    id: uuidv4(), // Generate a unique ID using uuid
+    created_at: now,
+    updated_at: now,
   }
+
+  tasks.push(task)
+  revalidatePath('/') // Revalidate the home page
+  return task
 }
 
