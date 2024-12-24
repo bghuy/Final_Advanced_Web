@@ -12,17 +12,19 @@ import { Loader2 } from 'lucide-react'
 interface CreateTaskModalProps {
   isOpen: boolean
   onClose: () => void
-  onCreateTask: (task: Omit<Task, 'id' | 'created_at' | 'updated_at' | 'focusSessions'>) => void
+  onCreateTask: (task: Omit<Task, 'id' | 'created_at' | 'updated_at'>) => void
   isLoading: boolean
 }
 
-type FormData = Omit<Task, 'id' | 'created_at' | 'updated_at' | 'focusSessions'>
+type FormData = Omit<Task, 'id' | 'created_at' | 'updated_at'>
 
 export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: CreateTaskModalProps) {
-  const { control, handleSubmit, formState: { errors, isValid } } = useForm<FormData>({
+  const { control, handleSubmit, watch, formState: { errors, isValid } } = useForm<FormData>({
     defaultValues: {
       title: '',
       description: '',
+      start_time: '',
+      end_time: '',
       deadline: '',
       status: 'Todo',
       priority: 'medium',
@@ -30,7 +32,12 @@ export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: Cr
     mode: 'onChange'
   })
 
+  const status = watch('status')
+
   const onSubmit = (data: FormData) => {
+    if (data.status === 'Todo' && !data.deadline) {
+      delete data.deadline;
+    }
     onCreateTask(data)
   }
 
@@ -67,20 +74,6 @@ export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: Cr
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="deadline" className="text-right">
-              Deadline
-            </Label>
-            <div className="col-span-3">
-              <Controller
-                name="deadline"
-                control={control}
-                rules={{ required: "Deadline is required" }}
-                render={({ field }) => <Input {...field} id="deadline" type="date" />}
-              />
-              {errors.deadline && <p className="text-sm text-red-500 mt-1">{errors.deadline.message}</p>}
-            </div>
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="status" className="text-right">
               Status
             </Label>
@@ -104,6 +97,44 @@ export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: Cr
                 )}
               />
               {errors.status && <p className="text-sm text-red-500 mt-1">{errors.status.message}</p>}
+            </div>
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="start_time" className="text-right">
+              Start Time
+            </Label>
+            <div className="col-span-3">
+              <Controller
+                name="start_time"
+                control={control}
+                render={({ field }) => <Input {...field} id="start_time" type="datetime-local" />}
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="end_time" className="text-right">
+              End Time
+            </Label>
+            <div className="col-span-3">
+              <Controller
+                name="end_time"
+                control={control}
+                render={({ field }) => <Input {...field} id="end_time" type="datetime-local" />}
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="deadline" className="text-right">
+              Deadline
+            </Label>
+            <div className="col-span-3">
+              <Controller
+                name="deadline"
+                control={control}
+                rules={{ required: status !== 'Todo' ? "Deadline is required" : false }}
+                render={({ field }) => <Input {...field} id="deadline" type="datetime-local" />}
+              />
+              {errors.deadline && <p className="text-sm text-red-500 mt-1">{errors.deadline.message}</p>}
             </div>
           </div>
           <div className="grid grid-cols-4 items-center gap-4">

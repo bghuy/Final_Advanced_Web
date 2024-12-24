@@ -10,13 +10,13 @@ interface TaskDetailModalProps {
   task: Task | null;
   isOpen: boolean;
   onClose: () => void;
-  onEdit: (task: Task) => void;
-  onDelete: (taskId: string) => void;
-  isLoading: boolean;
-  onOpenEditModal: () => void;
+  onEdit?: (task: Task) => void;
+  onDelete?: (taskId: string) => void;
+  isLoading?: boolean;
+  onOpenEditModal?: () => void;
 }
 
-export function TaskDetailModal({ task, isOpen, onClose, onDelete, isLoading, onOpenEditModal }: TaskDetailModalProps) {
+export function TaskDetailModal({ task, isOpen, onClose, onEdit, onDelete, isLoading = false, onOpenEditModal }: TaskDetailModalProps) {
   //const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
   if (!task) return null;
@@ -51,7 +51,7 @@ export function TaskDetailModal({ task, isOpen, onClose, onDelete, isLoading, on
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px] h-full data-[state=open]:rounded-none overflow-y-auto" position="right">
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold">{task.title}</DialogTitle>
           <DialogDescription>View task details.</DialogDescription>
@@ -62,8 +62,12 @@ export function TaskDetailModal({ task, isOpen, onClose, onDelete, isLoading, on
             <p className="text-sm text-gray-500">{task.description}</p>
           </div>
           <div>
-            <Label className="text-right font-bold">Deadline</Label>
-            <p className="text-sm text-gray-500">{new Date(task.deadline).toLocaleDateString()}</p>
+            <Label className="text-right font-bold">Start Time</Label>
+            <p className="text-sm text-gray-500">{new Date(task.start_time as string).toLocaleString()}</p>
+          </div>
+          <div>
+            <Label className="text-right font-bold">End Time</Label>
+            <p className="text-sm text-gray-500">{new Date(task.end_time as string).toLocaleString()}</p>
           </div>
           <div>
             <Label className="text-right font-bold">Status</Label>
@@ -85,28 +89,36 @@ export function TaskDetailModal({ task, isOpen, onClose, onDelete, isLoading, on
             <Label className="text-right font-bold">Updated At</Label>
             <p className="text-sm text-gray-500">{new Date(task.updated_at).toLocaleString()}</p>
           </div>
+          <div>
+            <Label className="text-right font-bold">Deadline</Label>
+            <p className="text-sm text-gray-500">{new Date(task.deadline as string).toLocaleString()}</p>
+          </div>
         </div>
         <div className="flex justify-end space-x-2">
-          <Button variant="outline" onClick={() => {
-            onClose();
-            onOpenEditModal();
-          }}>
-            <Edit className="mr-2 h-4 w-4" />
-            Edit
-          </Button>
-          <Button variant="destructive" onClick={() => onDelete(task.id)} disabled={isLoading}>
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Deleting...
-              </>
-            ) : (
-              <>
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete
-              </>
-            )}
-          </Button>
+          {onEdit && onOpenEditModal && (
+            <Button variant="outline" onClick={() => {
+              onClose();
+              onOpenEditModal();
+            }}>
+              <Edit className="mr-2 h-4 w-4" />
+              Edit
+            </Button>
+          )}
+          {onDelete && (
+            <Button variant="destructive" onClick={() => onDelete(task.id)} disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete
+                </>
+              )}
+            </Button>
+          )}
         </div>
       </DialogContent>
     </Dialog>
