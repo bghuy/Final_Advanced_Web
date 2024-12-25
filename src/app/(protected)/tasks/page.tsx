@@ -8,7 +8,6 @@ export default function TaskManagerPage() {
   const [chatMode, setChatMode] = useState<ChatMode>('recommend')
   return (
     <div className="container mx-auto py-10 px-2">
-      <h1 className="text-2xl font-bold mb-5">Task Manager</h1>
       <div className="grid grid-cols-12 gap-4 h-full">
         <div className = "h-full col-span-4">
           <AIChatBox onModeChange={setChatMode} />

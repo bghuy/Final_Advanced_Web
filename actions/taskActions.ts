@@ -1,8 +1,10 @@
-'use server'
+'use client'
 
-import { Task } from "@/types/task"
+import { CreateTaskType, Task } from "@/types/task"
 import { v4 as uuidv4 } from 'uuid'
 import { revalidatePath } from 'next/cache'
+import { CreateTask, GetTaskList } from "@/services/task"
+// import { ISODateString } from "@/types/ISODateString"
 
 const tasks: Task[] = [
   {
@@ -71,6 +73,26 @@ export async function getTasks(): Promise<Task[]> {
   await new Promise(resolve => setTimeout(resolve, 1000))
   return tasks
 }
+
+export async function fetchTaskList(start_time: Date, end_time: Date): Promise<Task[]> {
+  return await GetTaskList(start_time, end_time);
+}
+
+export async function createNewTask(newTask: CreateTaskType){
+  return await CreateTask(newTask);
+}
+
+// export async function createNewTask(newTask: Task): Promise<Task> {
+//   // Simulating API delay
+//   await new Promise(resolve => setTimeout(resolve, 1000))
+
+//   newTask.id = uuidv4()
+//   newTask.created_at = new Date().toISOString()
+//   newTask.updated_at = new Date().toISOString()
+//   tasks.push(newTask)
+//   revalidatePath('/') // Revalidate the home page
+//   return newTask
+// }
 
 export async function editTask(updatedTask: Task): Promise<Task> {
   // Simulating API delay

@@ -6,20 +6,20 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog"
-import { Task } from "@/types/task"
+import { CreateTaskType} from "@/types/task"
 import { Loader2 } from 'lucide-react'
 
 interface CreateTaskModalProps {
   isOpen: boolean
   onClose: () => void
-  onCreateTask: (task: Omit<Task, 'id' | 'created_at' | 'updated_at'>) => void
+  onCreateTask: (newTask: CreateTaskType) => void
   isLoading: boolean
 }
 
-type FormData = Omit<Task, 'id' | 'created_at' | 'updated_at'>
+// type FormData = Omit<Task, 'id' | 'created_at' | 'updated_at'>
 
 export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: CreateTaskModalProps) {
-  const { control, handleSubmit, watch, formState: { errors, isValid } } = useForm<FormData>({
+  const { control, handleSubmit, watch, formState: { errors, isValid } } = useForm<CreateTaskType>({
     defaultValues: {
       title: '',
       description: '',
@@ -34,7 +34,7 @@ export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: Cr
 
   const status = watch('status')
 
-  const onSubmit = (data: FormData) => {
+  const onSubmit = (data: CreateTaskType) => {
     if (data.status === 'Todo' && !data.deadline) {
       delete data.deadline;
     }

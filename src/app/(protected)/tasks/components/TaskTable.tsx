@@ -7,9 +7,9 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
 import { TaskDetailModal } from "./TaskDetailModal"
-import { Task } from "@/types/task"
+import { CreateTaskType, Task } from "@/types/task"
 import { Eye, ChevronUp, ChevronDown, Plus, Loader2, ArrowUpDown, BarChart2 } from 'lucide-react'
-import { getTasks, editTask, deleteTask, createTask } from "./../../../../../actions/taskActions"
+import { editTask, deleteTask, fetchTaskList, createNewTask } from "./../../../../../actions/taskActions"
 import { useToast } from "@/hooks/use-toast"
 import { CreateTaskModal } from "./CreateTaskModal"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -17,7 +17,8 @@ import { Spinner } from "./Spinner"
 import { EditTaskModal } from "./EditTaskModal"
 import { DateFilterButton } from "./DateFilterButton"
 import { ColumnVisibilityToggle } from "./ColumnVisibilityToggle"
-
+import { startOfMonth, endOfMonth } from 'date-fns';
+// import { ISODateString } from "@/types/ISODateString"
 interface TaskTableProps {
   chatMode: 'recommend' | 'set deadline'
 }
@@ -44,8 +45,6 @@ export const TaskTable: React.FC<TaskTableProps> = ({ chatMode }) => {
   const [priorityFilter, setPriorityFilter] = useState<Task['priority'] | 'all'>('all')
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [dateFilterField, setDateFilterField] = useState<DateFilterField>('start_time')
-  const [startDate, setStartDate] = useState<Date | undefined>(undefined)
-  const [endDate, setEndDate] = useState<Date | undefined>(undefined)
   const [columns, setColumns] = useState([
     { key: 'select', label: 'Select', isVisible: chatMode === 'set deadline' },
     { key: 'title', label: 'Title', isVisible: true },
@@ -58,7 +57,9 @@ export const TaskTable: React.FC<TaskTableProps> = ({ chatMode }) => {
   ])
   const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set())
   const [selectAll, setSelectAll] = useState(false)
-
+  const now = new Date();
+  const [startDate, setStartDate] = useState<Date>(startOfMonth(now));
+  const [endDate, setEndDate] = useState<Date>(endOfMonth(now));
   // const columns2 = [
   //   { key: 'title', label: 'Title' },
   //   { key: 'description', label: 'Description' },
@@ -71,7 +72,8 @@ export const TaskTable: React.FC<TaskTableProps> = ({ chatMode }) => {
 
   const fetchTasks = useCallback(async () => {
     try {
-      const fetchedTasks = await getTasks()
+      setLoading(true);
+      const fetchedTasks = await fetchTaskList(startDate, endDate)
       setTasks(fetchedTasks)
       setLoading(false)
     } catch (err) {
@@ -79,7 +81,13 @@ export const TaskTable: React.FC<TaskTableProps> = ({ chatMode }) => {
       setError("Failed to fetch data. Please try again later.")
       setLoading(false)
     }
-  }, [])
+  }, [startDate, endDate])
+  const assignStartDate = (date: Date | undefined) => {
+    setStartDate(date as Date);
+  };
+  const assignEndDate = (date: Date | undefined) => {
+    setEndDate(date as Date);
+  };
 
   useEffect(() => {
     fetchTasks()
@@ -201,11 +209,12 @@ export const TaskTable: React.FC<TaskTableProps> = ({ chatMode }) => {
     return result
   }, [tasks, searchTerm, sortConfig, statusFilter, priorityFilter])
 
-  const handleAddTask = (newTask: Omit<Task, 'id' | 'created_at' | 'updated_at' | 'focusSessions'>) => {
+  const handleAddTask = (newTask: CreateTaskType) => {
     startTransition(async () => {
       try {
-        const createdTask = await createTask(newTask)
-        setTasks(prevTasks => [...prevTasks, createdTask])
+        await createNewTask(newTask)
+        const fetchedTasks = await fetchTaskList(startDate || startOfMonth(now), endDate || endOfMonth(now))
+        setTasks(fetchedTasks)
         setIsAddTaskModalOpen(false)
         toast({
           title: "Task added",
@@ -275,8 +284,8 @@ export const TaskTable: React.FC<TaskTableProps> = ({ chatMode }) => {
 
   const handleDateFilterClear = () => {
     setDateFilterField('start_time')
-    setStartDate(undefined)
-    setEndDate(undefined)
+    setStartDate(startOfMonth(now))
+    setEndDate(endOfMonth(now))
   }
 
   const handleToggleColumn = (key: string) => {
@@ -357,8 +366,8 @@ export const TaskTable: React.FC<TaskTableProps> = ({ chatMode }) => {
             startDate={startDate}
             endDate={endDate}
             onDateFilterFieldChange={setDateFilterField}
-            onStartDateChange={setStartDate}
-            onEndDateChange={setEndDate}
+            onStartDateChange={assignStartDate}
+            onEndDateChange={assignEndDate}
             onApply={handleDateFilterApply}
             onClear={handleDateFilterClear}
           />
