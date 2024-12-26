@@ -318,7 +318,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({ chatMode }) => {
 
   return (
     <div className="w-full py-0">
-      <div className="space-y-4 mb-4">
+      <div className="space-y-4 mb-3">
         <div className="flex flex-row items-center space-x-2 w-full justify-between">
           <Input
             type="text"
