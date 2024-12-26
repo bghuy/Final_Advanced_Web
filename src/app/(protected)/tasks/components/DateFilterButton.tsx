@@ -4,14 +4,14 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Calendar } from "@/components/ui/calendar"
 import { CalendarIcon } from 'lucide-react'
-// import { ISODateString } from '@/types/ISODateString'
+import { format } from "date-fns"
 
-type DateFilterField = 'created_at' | 'updated_at' | 'start_time' | 'end_time';
+type DateFilterField = 'start_time' | 'end_time';
 
 interface DateFilterButtonProps {
   dateFilterField: DateFilterField
-  startDate: Date | undefined 
-  endDate: Date | undefined 
+  startDate: Date | undefined
+  endDate: Date | undefined
   onDateFilterFieldChange: (value: DateFilterField) => void
   onStartDateChange: (date: Date | undefined) => void
   onEndDateChange: (date: Date | undefined) => void
@@ -41,17 +41,15 @@ export function DateFilterButton({
     setIsOpen(false)
   }
 
-
-
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="justify-start text-left font-normal">
+        <Button variant="outline" className="w-[240px] justify-start text-left font-normal">
           <CalendarIcon className="mr-2 h-4 w-4" />
           {startDate && endDate ? (
-            <div>
-              {`${startDate} - ${endDate}`}
-            </div>
+            <>
+              {format(startDate, "LLL dd, y")} - {format(endDate, "LLL dd, y")}
+            </>
           ) : (
             <span>Pick a date range</span>
           )}
@@ -66,8 +64,6 @@ export function DateFilterButton({
             <SelectContent>
               <SelectItem value="start_time">Start Time</SelectItem>
               <SelectItem value="end_time">End Time</SelectItem>
-              <SelectItem value="created_at">Created At</SelectItem>
-              <SelectItem value="updated_at">Updated At</SelectItem>
             </SelectContent>
           </Select>
           <div className="flex space-x-2 flex-row">
@@ -79,7 +75,7 @@ export function DateFilterButton({
             />
             <Calendar
               mode="single"
-              selected={startDate}
+              selected={endDate}
               onSelect={onEndDateChange}
               initialFocus
             />
