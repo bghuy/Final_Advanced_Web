@@ -23,13 +23,13 @@ export function TaskDetailModal({ task, isOpen, onClose, onEdit, onDelete, isLoa
 
   const getStatusColor = (status: Task['status']) => {
     switch (status) {
-      case 'Todo':
+      case 'to do':
         return 'bg-yellow-500'
-      case 'In Progress':
+      case 'in progress':
         return 'bg-blue-500'
-      case 'Completed':
+      case 'completed':
         return 'bg-green-500'
-      case 'Expired':
+      case 'expired':
         return 'bg-red-500'
       default:
         return 'bg-gray-500'
@@ -65,10 +65,10 @@ export function TaskDetailModal({ task, isOpen, onClose, onEdit, onDelete, isLoa
             <Label className="text-right font-bold">Start Time</Label>
             <p className="text-sm text-gray-500">{new Date(task.start_time as string).toLocaleString()}</p>
           </div>
-          <div>
+          {/* <div>
             <Label className="text-right font-bold">End Time</Label>
             <p className="text-sm text-gray-500">{new Date(task.end_time as string).toLocaleString()}</p>
-          </div>
+          </div> */}
           <div>
             <Label className="text-right font-bold">Status</Label>
             <Badge className={`${getStatusColor(task.status)} text-white`}>
@@ -91,7 +91,7 @@ export function TaskDetailModal({ task, isOpen, onClose, onEdit, onDelete, isLoa
           </div>
           <div>
             <Label className="text-right font-bold">Deadline</Label>
-            <p className="text-sm text-gray-500">{new Date(task.deadline as string).toLocaleString()}</p>
+            <p className="text-sm text-gray-500">{new Date(task.end_time as string).toLocaleString()}</p>
           </div>
         </div>
         <div className="flex justify-end space-x-2">

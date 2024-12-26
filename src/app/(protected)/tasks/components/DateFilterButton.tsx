@@ -6,7 +6,7 @@ import { Calendar } from "@/components/ui/calendar"
 import { CalendarIcon } from 'lucide-react'
 import { format } from "date-fns"
 
-type DateFilterField = 'deadline' | 'created_at' | 'updated_at' | 'start_time' | 'end_time';
+type DateFilterField = 'start_time' | 'end_time';
 
 interface DateFilterButtonProps {
   dateFilterField: DateFilterField
@@ -62,11 +62,8 @@ export function DateFilterButton({
               <SelectValue placeholder="Select date field" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="deadline">Deadline</SelectItem>
               <SelectItem value="start_time">Start Time</SelectItem>
               <SelectItem value="end_time">End Time</SelectItem>
-              <SelectItem value="created_at">Created At</SelectItem>
-              <SelectItem value="updated_at">Updated At</SelectItem>
             </SelectContent>
           </Select>
           <div className="flex space-x-2 flex-row">

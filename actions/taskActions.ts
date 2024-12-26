@@ -1,8 +1,11 @@
-'use server'
+'use client'
 
-import { Task } from "@/types/task"
+import { CreateTaskType, Task } from "@/types/task"
 import { v4 as uuidv4 } from 'uuid'
 import { revalidatePath } from 'next/cache'
+import { CreateTask, GetTaskList } from "@/services/task"
+import { convertToISODateString } from "@/lib/utils"
+// import { ISODateString } from "@/types/ISODateString"
 
 const tasks: Task[] = [
   {
@@ -11,8 +14,7 @@ const tasks: Task[] = [
     description: "Draft and finalize the project proposal for the new client",
     start_time: "2023-12-31T09:00:00",
     end_time: "2023-12-31T23:59:00",
-    deadline: "2023-12-31T23:59:00",
-    status: "In Progress",
+    status: "in progress",
     priority: "high",
     created_at: "2023-11-15T09:00:00Z",
     updated_at: "2023-11-15T09:00:00Z",
@@ -23,11 +25,10 @@ const tasks: Task[] = [
     description: "Review and approve the latest pull requests",
     start_time: "2023-12-20T10:00:00",
     end_time: "2023-12-20T18:00:00",
-    status: "Todo",
+    status: "to do",
     priority: "medium",
     created_at: "2023-11-16T10:30:00Z",
     updated_at: "2023-11-16T10:30:00Z",
-    deadline: "2023-12-31T23:59:00"
   },
   {
     id: "3",
@@ -35,19 +36,17 @@ const tasks: Task[] = [
     description: "Update the user guide with the latest features",
     start_time: "2023-12-25T09:00:00",
     end_time: "2023-12-25T12:00:00",
-    status: "Completed",
+    status: "completed",
     priority: "low",
     created_at: "2023-11-17T11:45:00Z",
     updated_at: "2023-11-18T14:20:00Z",
-    deadline: "2023-12-31T23:59:00"
   },
   {
     id: "4",
     title: "Prepare presentation",
     description: "Create slides for the upcoming team meeting",
     start_time: "2023-12-22T13:00:00",
-    end_time: "2023-12-22T15:30:00",
-    status: "In Progress",
+    status: "in progress",
     priority: "medium",
     created_at: "2023-11-18T13:15:00Z",
     updated_at: "2023-11-18T13:15:00Z",
@@ -58,11 +57,10 @@ const tasks: Task[] = [
     description: "Investigate and fix bugs reported by QA team",
     start_time: "2023-12-18T09:00:00",
     end_time: "2023-12-18T17:00:00",
-    status: "Expired",
+    status: "expired",
     priority: "high",
     created_at: "2023-11-19T09:30:00Z",
     updated_at: "2023-11-20T11:45:00Z",
-    deadline: "2023-12-31T23:59:00"
   }
 ]
 
@@ -72,8 +70,17 @@ export async function getTasks(): Promise<Task[]> {
   return tasks
 }
 
+export async function fetchTaskList(start_time: string | Date | undefined, end_time: string | Date | undefined): Promise<Task[]> {
+  const start = start_time instanceof Date ? convertToISODateString(start_time) : start_time; 
+  const end = end_time instanceof Date ? convertToISODateString(end_time) : end_time;
+  return await GetTaskList(start || '', end || '');
+}
+
+export async function createNewTask(newTask: CreateTaskType){
+  return await CreateTask(newTask);
+}
+
 export async function editTask(updatedTask: Task): Promise<Task> {
-  // Simulating API delay
   await new Promise(resolve => setTimeout(resolve, 1000))
   
   const index = tasks.findIndex(task => task.id === updatedTask.id)

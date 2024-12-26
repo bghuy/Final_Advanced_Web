@@ -35,12 +35,12 @@ export default function TaskSidebar({ tasks, loading }: TaskSidebarProps) {
             <li key={task.id} className="bg-gray-50 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200">
               <Link href={`/task/${task.id}`}>
                 <h3 className="font-medium text-lg text-gray-800 mb-2">{task.title}</h3>
-                <p className="text-sm text-gray-600 mb-2">{task.description.substring(0, 100)}...</p>
+                <p className="text-sm text-gray-600 mb-2">{task?.description?.substring(0, 100) || ""}...</p>
                 <div className="flex justify-between items-center">
                   <Badge className={getBadgeClassName(task.priority)}>
                     {task.priority}
                   </Badge>
-                  <span className="text-xs text-gray-500">Due: {new Date(task.deadline as string).toLocaleDateString()}</span>
+                  <span className="text-xs text-gray-500">Due: {new Date(task.end_time as string).toLocaleDateString()}</span>
                 </div>
               </Link>
             </li>

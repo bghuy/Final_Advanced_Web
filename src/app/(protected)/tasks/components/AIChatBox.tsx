@@ -24,7 +24,7 @@ export function AIChatBox({ onModeChange }: { onModeChange: (mode: ChatMode) => 
   const [input, setInput] = useState('')
   const [mode, setMode] = useState<ChatMode>('recommend')
   const [isLoading, setIsLoading] = useState(false)
-  const [selectedColumn, setSelectedColumn] = useState<string>('deadline')
+  const [selectedColumn, setSelectedColumn] = useState<string>('end_time')
   const [isTaskDetailModalOpen, setIsTaskDetailModalOpen] = useState(false)
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
 
@@ -50,7 +50,7 @@ export function AIChatBox({ onModeChange }: { onModeChange: (mode: ChatMode) => 
   }
 
   const generateMockTasks = (mode: ChatMode): Task[] => {
-    const statuses: Task['status'][] = ['Todo', 'In Progress', 'Completed', 'Expired']
+    const statuses: Task['status'][] = ['to do', 'in progress', 'completed', 'expired']
     const priorities: Task['priority'][] = ['high', 'medium', 'low']
 
     return Array.from({ length: 3 }, (_, i) => ({
@@ -59,7 +59,7 @@ export function AIChatBox({ onModeChange }: { onModeChange: (mode: ChatMode) => 
       description: 'This is a mock task description',
       status: statuses[Math.floor(Math.random() * statuses.length)],
       priority: priorities[Math.floor(Math.random() * priorities.length)],
-      deadline: mode === 'set deadline' 
+      end_time: mode === 'set deadline' 
         ? new Date(Date.now() + Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString()
         : new Date(Date.now() + Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
       created_at: new Date().toISOString(),
@@ -84,10 +84,10 @@ export function AIChatBox({ onModeChange }: { onModeChange: (mode: ChatMode) => 
 
   const getStatusColor = (status: Task['status']): string => {
     switch (status) {
-      case 'Todo': return 'bg-yellow-500 text-white'
-      case 'In Progress': return 'bg-blue-500 text-white'
-      case 'Completed': return 'bg-green-500 text-white'
-      case 'Expired': return 'bg-red-500 text-white'
+      case 'to do': return 'bg-yellow-500 text-white'
+      case 'in progress': return 'bg-blue-500 text-white'
+      case 'completed': return 'bg-green-500 text-white'
+      case 'expired': return 'bg-red-500 text-white'
       default: return 'bg-gray-500 text-white'
     }
   }
@@ -129,7 +129,7 @@ export function AIChatBox({ onModeChange }: { onModeChange: (mode: ChatMode) => 
                       <Badge className={getStatusColor(task.status)}>{task.status}</Badge>
                       <Badge className={getPriorityColor(task.priority)}>{task.priority}</Badge>
                     </div>
-                    <p className="text-xs mt-1">Deadline: {new Date(task.deadline as string).toLocaleDateString()}</p>
+                    <p className="text-xs mt-1">Deadline: {new Date(task.end_time as string).toLocaleDateString()}</p>
                     <Button 
                       size="sm" 
                       variant="link" 
@@ -176,7 +176,7 @@ export function AIChatBox({ onModeChange }: { onModeChange: (mode: ChatMode) => 
                 <SelectValue placeholder="Select column" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="deadline">Deadline</SelectItem>
+                <SelectItem value="end_time">Deadline</SelectItem>
                 <SelectItem value="start_time">Start Time</SelectItem>
               </SelectContent>
             </Select>

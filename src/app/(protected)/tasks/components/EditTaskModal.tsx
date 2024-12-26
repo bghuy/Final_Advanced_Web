@@ -31,16 +31,15 @@ export function EditTaskModal({ task, isOpen, onClose, onUpdateTask, isLoading }
         ...task,
         start_time: task.start_time?.slice(0, 16) || '',
         end_time: task.end_time?.slice(0, 16) || '',
-        deadline: task.deadline?.slice(0, 16) || '',
       })
     }
   }, [task, reset])
 
   const onSubmit = (data: Task) => {
     if (task) {
-      if (data.status === 'Todo' && !data.deadline) {
-        delete data.deadline;
-      }
+      // if (data.status === 'Todo' && !data.deadline) {
+      //   delete data.deadline;
+      // }
       onUpdateTask({ ...task, ...data, updated_at: new Date().toISOString() })
     }
   }
@@ -93,10 +92,10 @@ export function EditTaskModal({ task, isOpen, onClose, onUpdateTask, isLoading }
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Todo">Todo</SelectItem>
-                      <SelectItem value="In Progress">In Progress</SelectItem>
-                      <SelectItem value="Completed">Completed</SelectItem>
-                      <SelectItem value="Expired">Expired</SelectItem>
+                      <SelectItem value="to do">Todo</SelectItem>
+                      <SelectItem value="in progress">in progress</SelectItem>
+                      <SelectItem value="completed">Completed</SelectItem>
+                      <SelectItem value="expired">Expired</SelectItem>
                     </SelectContent>
                   </Select>
                 )}
@@ -116,7 +115,7 @@ export function EditTaskModal({ task, isOpen, onClose, onUpdateTask, isLoading }
               />
             </div>
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
+          {/* <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="edit-end_time" className="text-right">
               End Time
             </Label>
@@ -127,19 +126,19 @@ export function EditTaskModal({ task, isOpen, onClose, onUpdateTask, isLoading }
                 render={({ field }) => <Input {...field} id="edit-end_time" type="datetime-local" />}
               />
             </div>
-          </div>
+          </div> */}
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="edit-deadline" className="text-right">
+            <Label htmlFor="edit-end_time" className="text-right">
               Deadline
             </Label>
             <div className="col-span-3">
               <Controller
-                name="deadline"
+                name="end_time"
                 control={control}
-                rules={{ required: status !== 'Todo' ? "Deadline is required" : false }}
-                render={({ field }) => <Input {...field} id="edit-deadline" type="datetime-local" />}
+                rules={{ required: status !== 'to do' ? "Deadline is required" : false }}
+                render={({ field }) => <Input {...field} id="edit-end_time" type="datetime-local" />}
               />
-              {errors.deadline && <p className="text-sm text-red-500 mt-1">{errors.deadline.message}</p>}
+              {errors.end_time && <p className="text-sm text-red-500 mt-1">{errors.end_time.message}</p>}
             </div>
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
