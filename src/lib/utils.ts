@@ -7,8 +7,10 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function getFirstDayOfMonth(date: Date | undefined) {
+  console.log(date, "date");
+  
   const currentDate = date ?? new Date();
-  const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+  const firstDayOfMonth = new Date(Date.UTC(currentDate.getUTCFullYear(), currentDate.getUTCMonth(), 1, 0, 0, 1));
   return formatDateWithoutMilliseconds(firstDayOfMonth);
 }
 
@@ -16,7 +18,7 @@ export function getFirstDayOfMonth(date: Date | undefined) {
 
 export function getLastDayOfMonth(date: Date | undefined) {
   const currentDate = date ?? new Date();
-  const lastDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+  const lastDayOfMonth = new Date(Date.UTC(currentDate.getUTCFullYear(), currentDate.getUTCMonth() + 1, 0, 23, 59, 59));
   return formatDateWithoutMilliseconds(lastDayOfMonth);
 }
 
@@ -33,7 +35,7 @@ export function convertToISODateString(date: Date | undefined): string {
 export function formatDateWithoutMilliseconds(date: Date | undefined): string {
   const currentDate = date ?? new Date();
   const isoString = currentDate.toISOString();
-  return isoString.slice(0, -5) + 'Z';  // Loại bỏ phần mili giây
+  return isoString
 }
 
 

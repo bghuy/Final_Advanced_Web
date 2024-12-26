@@ -34,11 +34,19 @@ export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: Cr
   const status = watch('status')
 
   const onSubmit = (data: CreateTaskType) => {
-    // if (data.status === 'Todo' && !data.end_time) {
-    //   delete data.deadline;
-    // }
-    onCreateTask(data)
+    const convertToISODateString = (date: string | undefined) => {
+      if (date) {
+        const isoDate = new Date(date).toISOString();
+        return isoDate;
+      }
+      return undefined;
+    }
+  
+    data.start_time = convertToISODateString(data.start_time);
+    data.end_time = convertToISODateString(data.end_time);
+    onCreateTask(data);
   }
+  
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

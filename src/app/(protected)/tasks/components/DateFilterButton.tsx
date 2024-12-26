@@ -44,7 +44,7 @@ export function DateFilterButton({
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="w-[240px] justify-start text-left font-normal">
+        <Button variant="outline" className="justify-start text-left font-normal">
           <CalendarIcon className="mr-2 h-4 w-4" />
           {startDate && endDate ? (
             <span>

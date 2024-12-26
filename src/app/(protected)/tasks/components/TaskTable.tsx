@@ -81,6 +81,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({ chatMode }) => {
   };
 
   useEffect(() => {
+    console.log("1");
     fetchTasks()
   }, [fetchTasks])
 
