@@ -25,7 +25,6 @@ export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: Cr
       description: '',
       start_time: '',
       end_time: '',
-      deadline: '',
       status: 'Todo',
       priority: 'medium',
     },
@@ -35,9 +34,9 @@ export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: Cr
   const status = watch('status')
 
   const onSubmit = (data: CreateTaskType) => {
-    if (data.status === 'Todo' && !data.deadline) {
-      delete data.deadline;
-    }
+    // if (data.status === 'Todo' && !data.end_time) {
+    //   delete data.deadline;
+    // }
     onCreateTask(data)
   }
 
@@ -111,7 +110,7 @@ export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: Cr
               />
             </div>
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
+          {/* <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="end_time" className="text-right">
               End Time
             </Label>
@@ -122,19 +121,19 @@ export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: Cr
                 render={({ field }) => <Input {...field} id="end_time" type="datetime-local" />}
               />
             </div>
-          </div>
+          </div> */}
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="deadline" className="text-right">
+            <Label htmlFor="end_time" className="text-right">
               Deadline
             </Label>
             <div className="col-span-3">
               <Controller
-                name="deadline"
+                name="end_time"
                 control={control}
                 rules={{ required: status !== 'Todo' ? "Deadline is required" : false }}
-                render={({ field }) => <Input {...field} id="deadline" type="datetime-local" />}
+                render={({ field }) => <Input {...field} id="end_time" type="datetime-local" />}
               />
-              {errors.deadline && <p className="text-sm text-red-500 mt-1">{errors.deadline.message}</p>}
+              {errors.end_time && <p className="text-sm text-red-500 mt-1">{errors.end_time.message}</p>}
             </div>
           </div>
           <div className="grid grid-cols-4 items-center gap-4">

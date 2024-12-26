@@ -17,7 +17,7 @@ import { Spinner } from "./Spinner"
 import { EditTaskModal } from "./EditTaskModal"
 import { DateFilterButton } from "./DateFilterButton"
 import { ColumnVisibilityToggle } from "./ColumnVisibilityToggle"
-import { startOfMonth, endOfMonth } from 'date-fns';
+import { getFirstDayOfMonth, getLastDayOfMonth } from "@/lib/utils"
 // import { ISODateString } from "@/types/ISODateString"
 interface TaskTableProps {
   chatMode: 'recommend' | 'set deadline'
@@ -28,7 +28,7 @@ type SortConfig = {
   direction: 'asc' | 'desc';
 } | null;
 
-type DateFilterField = 'deadline' | 'created_at' | 'updated_at' | 'start_time' | 'end_time';
+type DateFilterField = 'created_at' | 'updated_at' | 'start_time' | 'end_time';
 
 export const TaskTable: React.FC<TaskTableProps> = ({ chatMode }) => {
   const [tasks, setTasks] = useState<Task[]>([])
@@ -37,7 +37,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({ chatMode }) => {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
-  const [sortConfig, setSortConfig] = useState<SortConfig>({key: "deadline", direction: "desc" })
+  const [sortConfig, setSortConfig] = useState<SortConfig>({key: "end_time", direction: "desc" })
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false)
   const { toast } = useToast()
   const [isPending, startTransition] = useTransition()
@@ -51,29 +51,20 @@ export const TaskTable: React.FC<TaskTableProps> = ({ chatMode }) => {
     { key: 'description', label: 'Description', isVisible: true },
     { key: 'start_time', label: 'Start Time', isVisible: true },
     { key: 'end_time', label: 'End Time', isVisible: true },
-    { key: 'deadline', label: 'Deadline', isVisible: true },
     { key: 'status', label: 'Status', isVisible: true },
     { key: 'priority', label: 'Priority', isVisible: true },
   ])
   const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set())
   const [selectAll, setSelectAll] = useState(false)
   const now = new Date();
-  const [startDate, setStartDate] = useState<Date>(startOfMonth(now));
-  const [endDate, setEndDate] = useState<Date>(endOfMonth(now));
-  // const columns2 = [
-  //   { key: 'title', label: 'Title' },
-  //   { key: 'description', label: 'Description' },
-  //   { key: 'start_time', label: 'Start Time' },
-  //   { key: 'end_time', label: 'End Time' },
-  //   { key: 'deadline', label: 'Deadline' },
-  //   { key: 'status', label: 'Status' },
-  //   { key: 'priority', label: 'Priority' },
-  // ]
+  const [startDate, setStartDate] = useState<Date | undefined | string>(getFirstDayOfMonth(now));
+  const [endDate, setEndDate] = useState<Date | undefined | string>(getLastDayOfMonth(now));
+
 
   const fetchTasks = useCallback(async () => {
     try {
       setLoading(true);
-      const fetchedTasks = await fetchTaskList(startDate, endDate)
+      const fetchedTasks = await fetchTaskList(startDate, endDate) || []
       setTasks(fetchedTasks)
       setLoading(false)
     } catch (err) {
@@ -82,11 +73,11 @@ export const TaskTable: React.FC<TaskTableProps> = ({ chatMode }) => {
       setLoading(false)
     }
   }, [startDate, endDate])
-  const assignStartDate = (date: Date | undefined) => {
-    setStartDate(date as Date);
+  const assignStartDate = (date: Date | undefined | string) => {
+    setStartDate(date as string);
   };
-  const assignEndDate = (date: Date | undefined) => {
-    setEndDate(date as Date);
+  const assignEndDate = (date: Date | undefined | string) => {
+    setEndDate(date as string);
   };
 
   useEffect(() => {
@@ -213,7 +204,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({ chatMode }) => {
     startTransition(async () => {
       try {
         await createNewTask(newTask)
-        const fetchedTasks = await fetchTaskList(startDate || startOfMonth(now), endDate || endOfMonth(now))
+        const fetchedTasks = await fetchTaskList(startDate || getFirstDayOfMonth(now), endDate || getLastDayOfMonth(now))
         setTasks(fetchedTasks)
         setIsAddTaskModalOpen(false)
         toast({
@@ -284,8 +275,8 @@ export const TaskTable: React.FC<TaskTableProps> = ({ chatMode }) => {
 
   const handleDateFilterClear = () => {
     setDateFilterField('start_time')
-    setStartDate(startOfMonth(now))
-    setEndDate(endOfMonth(now))
+    setStartDate(getFirstDayOfMonth(now))
+    setEndDate(getLastDayOfMonth(now))
   }
 
   const handleToggleColumn = (key: string) => {
@@ -363,8 +354,8 @@ export const TaskTable: React.FC<TaskTableProps> = ({ chatMode }) => {
         <div className="flex flex-row items-center space-x-2 justify-between">
           <DateFilterButton
             dateFilterField={dateFilterField}
-            startDate={startDate}
-            endDate={endDate}
+            startDate={startDate as Date}
+            endDate={endDate as Date}
             onDateFilterFieldChange={setDateFilterField}
             onStartDateChange={assignStartDate}
             onEndDateChange={assignEndDate}
@@ -430,13 +421,12 @@ export const TaskTable: React.FC<TaskTableProps> = ({ chatMode }) => {
                 <TableCell key={`${task.id}-${column.key}`}>
                   {column.key === 'title' && task.title}
                   {column.key === 'description' && (
-                    task.description.length > 20
-                      ? `${task.description.substring(0, 20)}...`
-                      : task.description
+                    task?.description?.length as number > 20
+                      ? `${task?.description?.substring(0, 20)}...`
+                      : (task?.description || '')
                   )}
                   {column.key === 'start_time' && new Date(task.start_time as string).toLocaleString()}
                   {column.key === 'end_time' && new Date(task.end_time as string).toLocaleString()}
-                  {column.key === 'deadline' && new Date(task.deadline as string).toLocaleString()}
                   {column.key === 'status' && (
                     <Badge className={`${getStatusColor(task.status)} hover:${getStatusHoverColor(task.status)}`}>
                       {task.status}

@@ -122,7 +122,7 @@ export default function TaskPage() {
           <label className="block text-gray-700 text-sm font-bold mb-2">
             Deadline
           </label>
-          <p className="text-gray-700 text-base">{new Date(task.deadline as string).toLocaleDateString()}</p>
+          <p className="text-gray-700 text-base">{new Date(task.end_time as string).toLocaleDateString()}</p>
         </div>
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2">

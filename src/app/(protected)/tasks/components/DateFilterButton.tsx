@@ -4,14 +4,14 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Calendar } from "@/components/ui/calendar"
 import { CalendarIcon } from 'lucide-react'
-import { format } from "date-fns"
+import { ISODateString } from '@/types/ISODateString'
 
-type DateFilterField = 'deadline' | 'created_at' | 'updated_at' | 'start_time' | 'end_time';
+type DateFilterField = 'created_at' | 'updated_at' | 'start_time' | 'end_time';
 
 interface DateFilterButtonProps {
   dateFilterField: DateFilterField
-  startDate: Date | undefined
-  endDate: Date | undefined
+  startDate: Date | undefined 
+  endDate: Date | undefined | ISODateString
   onDateFilterFieldChange: (value: DateFilterField) => void
   onStartDateChange: (date: Date | undefined) => void
   onEndDateChange: (date: Date | undefined) => void
@@ -47,9 +47,9 @@ export function DateFilterButton({
         <Button variant="outline" className="w-[240px] justify-start text-left font-normal">
           <CalendarIcon className="mr-2 h-4 w-4" />
           {startDate && endDate ? (
-            <>
-              {format(startDate, "LLL dd, y")} - {format(endDate, "LLL dd, y")}
-            </>
+            <span>
+              {`${startDate} - ${endDate}`}
+            </span>
           ) : (
             <span>Pick a date range</span>
           )}
@@ -62,7 +62,6 @@ export function DateFilterButton({
               <SelectValue placeholder="Select date field" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="deadline">Deadline</SelectItem>
               <SelectItem value="start_time">Start Time</SelectItem>
               <SelectItem value="end_time">End Time</SelectItem>
               <SelectItem value="created_at">Created At</SelectItem>
@@ -78,7 +77,7 @@ export function DateFilterButton({
             />
             <Calendar
               mode="single"
-              selected={endDate}
+              selected={startDate}
               onSelect={onEndDateChange}
               initialFocus
             />

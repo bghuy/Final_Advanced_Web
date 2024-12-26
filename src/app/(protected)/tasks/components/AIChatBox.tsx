@@ -17,14 +17,14 @@ type ChatMessage = {
   tasks?: Task[]
 }
 
-export type ChatMode = 'recommend' | 'set deadline'
+export type ChatMode = 'recommend' | 'set end_time'
 
 export function AIChatBox({ onModeChange }: { onModeChange: (mode: ChatMode) => void }) {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [input, setInput] = useState('')
   const [mode, setMode] = useState<ChatMode>('recommend')
   const [isLoading, setIsLoading] = useState(false)
-  const [selectedColumn, setSelectedColumn] = useState<string>('deadline')
+  const [selectedColumn, setSelectedColumn] = useState<string>('end_time')
   const [isTaskDetailModalOpen, setIsTaskDetailModalOpen] = useState(false)
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
 
@@ -59,7 +59,7 @@ export function AIChatBox({ onModeChange }: { onModeChange: (mode: ChatMode) => 
       description: 'This is a mock task description',
       status: statuses[Math.floor(Math.random() * statuses.length)],
       priority: priorities[Math.floor(Math.random() * priorities.length)],
-      deadline: mode === 'set deadline' 
+      end_time: mode === 'set end_time' 
         ? new Date(Date.now() + Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString()
         : new Date(Date.now() + Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
       created_at: new Date().toISOString(),
@@ -129,7 +129,7 @@ export function AIChatBox({ onModeChange }: { onModeChange: (mode: ChatMode) => 
                       <Badge className={getStatusColor(task.status)}>{task.status}</Badge>
                       <Badge className={getPriorityColor(task.priority)}>{task.priority}</Badge>
                     </div>
-                    <p className="text-xs mt-1">Deadline: {new Date(task.deadline as string).toLocaleDateString()}</p>
+                    <p className="text-xs mt-1">Deadline: {new Date(task.end_time as string).toLocaleDateString()}</p>
                     <Button 
                       size="sm" 
                       variant="link" 
@@ -167,16 +167,16 @@ export function AIChatBox({ onModeChange }: { onModeChange: (mode: ChatMode) => 
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="recommend">Recommend</SelectItem>
-              <SelectItem value="set deadline">Set Deadline</SelectItem>
+              <SelectItem value="set end_time">Set Deadline</SelectItem>
             </SelectContent>
           </Select>
-          {mode === 'set deadline' && (
+          {mode === 'set end_time' && (
             <Select value={selectedColumn} onValueChange={setSelectedColumn}>
               <SelectTrigger>
                 <SelectValue placeholder="Select column" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="deadline">Deadline</SelectItem>
+                <SelectItem value="end_time">Deadline</SelectItem>
                 <SelectItem value="start_time">Start Time</SelectItem>
               </SelectContent>
             </Select>

@@ -1,8 +1,7 @@
+import { getFirstDayOfMonth, getLastDayOfMonth } from "@/lib/utils";
 import axios from "@/setup/axios";
 import { CreateTaskType} from "@/types/task";
-// import { ISODateString } from "@/types/ISODateString";
-import { startOfMonth, endOfMonth } from 'date-fns';
-export const GetTaskList = async (startTime: Date, endTime: Date) => {
+export const GetTaskList = async (startTime: string, endTime: string) => {
     try {
         const now = new Date();
         // const startOfMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0)).toISOString();
@@ -12,8 +11,8 @@ export const GetTaskList = async (startTime: Date, endTime: Date) => {
         //     0,
         //     23, 59, 59
         //   )).toISOString();
-        const start_day_month = startOfMonth(now);
-        const end_day_month = endOfMonth(now);
+        const start_day_month = getFirstDayOfMonth(now);
+        const end_day_month = getLastDayOfMonth(now);
         const start = startTime || start_day_month;
         const end = endTime || end_day_month;
         const response = await axios.get(`/task/all?start_time=${start}&end_time=${end}`);
