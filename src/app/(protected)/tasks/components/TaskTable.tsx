@@ -103,13 +103,13 @@ export const TaskTable: React.FC<TaskTableProps> = ({ chatMode }) => {
 
   const getStatusColor = (status: Task['status']): string => {
     switch (status) {
-      case 'Todo':
+      case 'to do':
         return 'bg-yellow-500 text-white'
-      case 'In Progress':
+      case 'in progress':
         return 'bg-blue-500 text-white'
-      case 'Completed':
+      case 'completed':
         return 'bg-green-500 text-white'
-      case 'Expired':
+      case 'expired':
         return 'bg-red-500 text-white'
       default:
         return 'bg-gray-500 text-white'
@@ -118,13 +118,13 @@ export const TaskTable: React.FC<TaskTableProps> = ({ chatMode }) => {
   
   const getStatusHoverColor = (status: Task['status']): string => {
     switch (status) {
-      case 'Todo':
+      case 'to do':
         return 'bg-yellow-700 text-white'
-      case 'In Progress':
+      case 'in progress':
         return 'bg-blue-700 text-white'
-      case 'Completed':
+      case 'completed':
         return 'bg-green-700 text-white'
-      case 'Expired':
+      case 'expired':
         return 'bg-red-700 text-white'
       default:
         return 'bg-gray-700 text-white'
@@ -332,10 +332,10 @@ export const TaskTable: React.FC<TaskTableProps> = ({ chatMode }) => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="Todo">Todo</SelectItem>
-              <SelectItem value="In Progress">In Progress</SelectItem>
-              <SelectItem value="Completed">Completed</SelectItem>
-              <SelectItem value="Expired">Expired</SelectItem>
+              <SelectItem value="to do">Todo</SelectItem>
+              <SelectItem value="in progress">in progress</SelectItem>
+              <SelectItem value="completed">Completed</SelectItem>
+              <SelectItem value="expired">Expired</SelectItem>
             </SelectContent>
           </Select>
           

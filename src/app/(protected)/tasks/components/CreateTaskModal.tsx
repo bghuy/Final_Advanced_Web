@@ -25,7 +25,7 @@ export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: Cr
       description: '',
       start_time: '',
       end_time: '',
-      status: 'Todo',
+      status: 'to do',
       priority: 'medium',
     },
     mode: 'onChange'
@@ -95,10 +95,10 @@ export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: Cr
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Todo">Todo</SelectItem>
-                      <SelectItem value="In Progress">In Progress</SelectItem>
-                      <SelectItem value="Completed">Completed</SelectItem>
-                      <SelectItem value="Expired">Expired</SelectItem>
+                      <SelectItem value="to do">Todo</SelectItem>
+                      <SelectItem value="in progress">in progress</SelectItem>
+                      <SelectItem value="completed">Completed</SelectItem>
+                      <SelectItem value="expired">Expired</SelectItem>
                     </SelectContent>
                   </Select>
                 )}
@@ -138,7 +138,7 @@ export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: Cr
               <Controller
                 name="end_time"
                 control={control}
-                rules={{ required: status !== 'Todo' ? "Deadline is required" : false }}
+                rules={{ required: status !== 'to do' ? "Deadline is required" : false }}
                 render={({ field }) => <Input {...field} id="end_time" type="datetime-local" />}
               />
               {errors.end_time && <p className="text-sm text-red-500 mt-1">{errors.end_time.message}</p>}

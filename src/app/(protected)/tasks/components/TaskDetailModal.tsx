@@ -23,13 +23,13 @@ export function TaskDetailModal({ task, isOpen, onClose, onEdit, onDelete, isLoa
 
   const getStatusColor = (status: Task['status']) => {
     switch (status) {
-      case 'Todo':
+      case 'to do':
         return 'bg-yellow-500'
-      case 'In Progress':
+      case 'in progress':
         return 'bg-blue-500'
-      case 'Completed':
+      case 'completed':
         return 'bg-green-500'
-      case 'Expired':
+      case 'expired':
         return 'bg-red-500'
       default:
         return 'bg-gray-500'

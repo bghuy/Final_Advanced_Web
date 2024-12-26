@@ -60,7 +60,7 @@ export default function FocusTimerPage({ params }: { params: Promise<{ id: strin
   }, [isRunning, timeLeft])
 
   const startTimer = () => {
-    if (task?.status !== 'In Progress') {
+    if (task?.status !== 'in progress') {
       toast({
         title: "Cannot start timer",
         description: "The task must be in progress to start the timer.",
@@ -149,7 +149,7 @@ export default function FocusTimerPage({ params }: { params: Promise<{ id: strin
         </div>
         <div className="flex justify-center space-x-2">
           {!isRunning ? (
-            <Button onClick={startTimer} disabled={task.status !== 'In Progress'}>
+            <Button onClick={startTimer} disabled={task.status !== 'in progress'}>
               <Play className="mr-2 h-4 w-4" />
               Start Focus Timer
             </Button>

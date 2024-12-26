@@ -43,13 +43,13 @@ export default function TaskPage() {
 
   const getStatusColor = (status: Task['status']) => {
     switch (status) {
-      case 'Todo':
+      case 'to do':
         return 'bg-yellow-500'
-      case 'In Progress':
+      case 'in progress':
         return 'bg-blue-500'
-      case 'Completed':
+      case 'completed':
         return 'bg-green-500'
-      case 'Expired':
+      case 'expired':
         return 'bg-red-500'
       default:
         return 'bg-gray-500'
@@ -177,7 +177,7 @@ export default function TaskPage() {
             )}
           </Button>
           <Link href={`/task/${task.id}/focus-timer`} passHref>
-            <Button variant="default" disabled={task.status !== 'In Progress'}>
+            <Button variant="default" disabled={task.status !== 'in progress'}>
               <Timer className="mr-2 h-4 w-4" />
               Focus Timer
             </Button>

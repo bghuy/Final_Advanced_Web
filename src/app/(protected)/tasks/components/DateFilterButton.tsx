@@ -4,14 +4,14 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Calendar } from "@/components/ui/calendar"
 import { CalendarIcon } from 'lucide-react'
-import { ISODateString } from '@/types/ISODateString'
+// import { ISODateString } from '@/types/ISODateString'
 
 type DateFilterField = 'created_at' | 'updated_at' | 'start_time' | 'end_time';
 
 interface DateFilterButtonProps {
   dateFilterField: DateFilterField
   startDate: Date | undefined 
-  endDate: Date | undefined | ISODateString
+  endDate: Date | undefined 
   onDateFilterFieldChange: (value: DateFilterField) => void
   onStartDateChange: (date: Date | undefined) => void
   onEndDateChange: (date: Date | undefined) => void
@@ -41,15 +41,17 @@ export function DateFilterButton({
     setIsOpen(false)
   }
 
+
+
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
         <Button variant="outline" className="justify-start text-left font-normal">
           <CalendarIcon className="mr-2 h-4 w-4" />
           {startDate && endDate ? (
-            <span>
+            <div>
               {`${startDate} - ${endDate}`}
-            </span>
+            </div>
           ) : (
             <span>Pick a date range</span>
           )}
