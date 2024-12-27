@@ -1,6 +1,6 @@
 import { getFirstDayOfMonth, getLastDayOfMonth } from "@/lib/utils";
 import axios from "@/setup/axios";
-import { CreateTaskType} from "@/types/task";
+import { CreateTaskType, UpdateTaskPutType} from "@/types/task";
 export const GetTaskList = async (startTime: string, endTime: string) => {
     try {
         const now = new Date();
@@ -35,6 +35,32 @@ export const CreateTask = async (task: CreateTaskType) => {
             console.log("Task not created!", error.message);
         } else {
             console.log("Task not created!", "An unknown error occurred");
+        }
+    }
+};
+
+export const UpdateTask = async (id:string, task: UpdateTaskPutType) => {
+    try {
+        const response = await axios.put(`/task/${id}`, task);
+        return response.data;
+    } catch (error) {
+        if (error instanceof Error) {
+            console.log("Task not created!", error.message);
+        } else {
+            console.log("Task not created!", "An unknown error occurred");
+        }
+    }
+};
+
+export const DeleteTasks = async (Ids: string[]) => {
+    try {
+        const response = await axios.delete(`/task`, { data: { ids: Ids } });
+        return response.data;
+    } catch (error) {
+        if (error instanceof Error) {
+            console.log("Tasks not deleted!", error.message);
+        } else {
+            console.log("Tasks not deleted!", "An unknown error occurred");
         }
     }
 };

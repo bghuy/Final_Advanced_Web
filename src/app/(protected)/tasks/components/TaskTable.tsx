@@ -9,7 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { TaskDetailModal } from "./TaskDetailModal"
 import { CreateTaskType, Task } from "@/types/task"
 import { Eye, ChevronUp, ChevronDown, Plus, Loader2, ArrowUpDown, BarChart2 } from 'lucide-react'
-import { editTask, deleteTask, fetchTaskList, createNewTask } from "./../../../../../actions/taskActions"
+import { fetchTaskList, createNewTask, updatedTask, removeTask } from "./../../../../../actions/taskActions"
 import { useToast } from "@/hooks/use-toast"
 import { CreateTaskModal } from "./CreateTaskModal"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -224,11 +224,14 @@ export const TaskTable: React.FC<TaskTableProps> = ({ chatMode }) => {
     })
   }
 
-  const handleUpdateTask = async (updatedTask: Task) => {
+  const handleUpdateTask = async (updatedTaskData: Task) => {
     startTransition(async () => {
       try {
-        const result = await editTask(updatedTask)
-        setTasks(prevTasks => prevTasks.map(task => task.id === result.id ? result : task))
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const {created_at,updated_at,...taskData} = updatedTaskData
+        await updatedTask(taskData);
+        const fetchedTasks = await fetchTaskList(startDate || getFirstDayOfMonth(now), endDate || getLastDayOfMonth(now))
+        setTasks(fetchedTasks)
         setIsEditModalOpen(false)
         toast({
           title: "Task updated",
@@ -249,8 +252,9 @@ export const TaskTable: React.FC<TaskTableProps> = ({ chatMode }) => {
   const handleDeleteTask = async (taskId: string) => {
     startTransition(async () => {
       try {
-        await deleteTask(taskId)
-        setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId))
+        await removeTask([taskId])
+        const fetchedTasks = await fetchTaskList(startDate || getFirstDayOfMonth(now), endDate || getLastDayOfMonth(now))
+        setTasks(fetchedTasks)
         setIsModalOpen(false)
         toast({
           title: "Task deleted",

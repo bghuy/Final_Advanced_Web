@@ -29,18 +29,21 @@ export function EditTaskModal({ task, isOpen, onClose, onUpdateTask, isLoading }
     if (task) {
       reset({
         ...task,
-        start_time: task.start_time?.slice(0, 16) || '',
-        end_time: task.end_time?.slice(0, 16) || '',
+        start_time: formatDateForInput(task.start_time),
+        end_time: formatDateForInput(task.end_time),
       })
     }
   }, [task, reset])
 
   const onSubmit = (data: Task) => {
     if (task) {
-      // if (data.status === 'Todo' && !data.deadline) {
-      //   delete data.deadline;
-      // }
-      onUpdateTask({ ...task, ...data, updated_at: new Date().toISOString() })
+      onUpdateTask({ 
+        ...task, 
+        ...data, 
+        start_time: formatDateForServer(data.start_time),
+        end_time: formatDateForServer(data.end_time),
+        updated_at: new Date().toISOString() 
+      })
     }
   }
 
@@ -93,7 +96,7 @@ export function EditTaskModal({ task, isOpen, onClose, onUpdateTask, isLoading }
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="to do">Todo</SelectItem>
-                      <SelectItem value="in progress">in progress</SelectItem>
+                      <SelectItem value="in progress">In Progress</SelectItem>
                       <SelectItem value="completed">Completed</SelectItem>
                       <SelectItem value="expired">Expired</SelectItem>
                     </SelectContent>
@@ -115,18 +118,6 @@ export function EditTaskModal({ task, isOpen, onClose, onUpdateTask, isLoading }
               />
             </div>
           </div>
-          {/* <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="edit-end_time" className="text-right">
-              End Time
-            </Label>
-            <div className="col-span-3">
-              <Controller
-                name="end_time"
-                control={control}
-                render={({ field }) => <Input {...field} id="edit-end_time" type="datetime-local" />}
-              />
-            </div>
-          </div> */}
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="edit-end_time" className="text-right">
               Deadline
@@ -182,5 +173,17 @@ export function EditTaskModal({ task, isOpen, onClose, onUpdateTask, isLoading }
       </DialogContent>
     </Dialog>
   )
+}
+
+function formatDateForInput(dateString: string | undefined): string {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  return date.toISOString().slice(0, 16)
+}
+
+function formatDateForServer(dateString: string | undefined): string {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  return date.toISOString()
 }
 

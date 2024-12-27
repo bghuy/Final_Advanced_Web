@@ -1,9 +1,9 @@
 'use client'
 
-import { CreateTaskType, Task } from "@/types/task"
+import { CreateTaskType, Task, UpdateTaskType } from "@/types/task"
 import { v4 as uuidv4 } from 'uuid'
 import { revalidatePath } from 'next/cache'
-import { CreateTask, GetTaskList } from "@/services/task"
+import { CreateTask, DeleteTasks, GetTaskList, UpdateTask } from "@/services/task"
 import { convertToISODateString } from "@/lib/utils"
 // import { ISODateString } from "@/types/ISODateString"
 
@@ -80,6 +80,11 @@ export async function createNewTask(newTask: CreateTaskType){
   return await CreateTask(newTask);
 }
 
+export async function updatedTask(updatedTask: UpdateTaskType) {
+  const { id, ...taskData } = updatedTask;
+  return await UpdateTask(id, taskData);
+}
+
 export async function editTask(updatedTask: Task): Promise<Task> {
   await new Promise(resolve => setTimeout(resolve, 1000))
   
@@ -92,6 +97,10 @@ export async function editTask(updatedTask: Task): Promise<Task> {
   tasks[index] = updatedTask
   revalidatePath('/') // Revalidate the home page
   return updatedTask
+}
+
+export async function removeTask (Ids: string[]) {
+  return await DeleteTasks(Ids);
 }
 
 export async function deleteTask(taskId: string): Promise<void> {
