@@ -107,7 +107,7 @@ export function AIChatBox({ onModeChange }: { onModeChange: (mode: ChatMode) => 
   }
 
   return (
-    <div className="flex flex-col h-[600px] border rounded-lg overflow-hidden">
+    <div className="flex flex-col border rounded-lg overflow-hidden h-full">
       <ScrollArea className="flex-grow p-4">
         {messages.map(message => (
           <div key={message.id} className={`mb-4 ${message.isUser ? 'text-right' : 'text-left'}`}>

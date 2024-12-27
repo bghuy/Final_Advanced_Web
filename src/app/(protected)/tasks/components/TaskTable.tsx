@@ -18,7 +18,7 @@ import { EditTaskModal } from "./EditTaskModal"
 import { DateFilterButton } from "./DateFilterButton"
 import { ColumnVisibilityToggle } from "./ColumnVisibilityToggle"
 import { getFirstDayOfMonth, getLastDayOfMonth } from "@/lib/utils"
-import { ScrollArea } from "@/components/ui/scroll-area"
+// import { ScrollArea } from "@/components/ui/scroll-area"
 // import { ISODateString } from "@/types/ISODateString"
 interface TaskTableProps {
   chatMode: 'recommend' | 'set deadline'
@@ -317,7 +317,8 @@ export const TaskTable: React.FC<TaskTableProps> = ({ chatMode }) => {
   }
 
   return (
-    <div className="w-full py-0">
+    <>
+    <div className="flex flex-col w-full h-full">
       <div className="space-y-4 mb-3">
         <div className="flex flex-row items-center space-x-2 w-full justify-between">
           <Input
@@ -372,105 +373,107 @@ export const TaskTable: React.FC<TaskTableProps> = ({ chatMode }) => {
           </div>
         </div>
       </div>
-      <div className="h-[500px] overflow-hidden">
-        <ScrollArea className="h-full w-full">
-          <Table>
-          <TableHeader>
-            <TableRow>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            {columns.find(col => col.key === 'select')?.isVisible && (
+              <TableHead>
+                <Checkbox
+                  checked={selectAll}
+                  onCheckedChange={handleSelectAll}
+                  aria-label="Select all tasks"
+                />
+              </TableHead>
+            )}
+            {columns.filter(column => column.isVisible && column.key !== 'select').map(column => (
+              <TableHead 
+                key={column.key} 
+                className="cursor-pointer"
+                onClick={() => handleSort(column.key as keyof Task)}
+              >
+                <div className="flex items-center">
+                  {column.label}
+                  {sortConfig?.key === column.key ? (
+                    sortConfig.direction === 'asc' ? (
+                      <ChevronUp className="ml-2 h-4 w-4" />
+                    ) : (
+                      <ChevronDown className="ml-2 h-4 w-4" />
+                    )
+                  ) : (
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                  )}
+                </div>
+              </TableHead>
+            ))}
+            <TableHead className="text-right">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {filteredAndSortedTasks.map((task) => (
+            <TableRow key={task.id}>
               {columns.find(col => col.key === 'select')?.isVisible && (
-                <TableHead>
+                <TableCell>
                   <Checkbox
-                    checked={selectAll}
-                    onCheckedChange={handleSelectAll}
-                    aria-label="Select all tasks"
+                    checked={selectedTasks.has(task.id)}
+                    onCheckedChange={() => handleSelectTask(task.id)}
+                    aria-label={`Select task ${task.title}`}
                   />
-                </TableHead>
+                </TableCell>
               )}
               {columns.filter(column => column.isVisible && column.key !== 'select').map(column => (
-                <TableHead 
-                  key={column.key} 
-                  className="cursor-pointer"
-                  onClick={() => handleSort(column.key as keyof Task)}
-                >
-                  <div className="flex items-center">
-                    {column.label}
-                    {sortConfig?.key === column.key ? (
-                      sortConfig.direction === 'asc' ? (
-                        <ChevronUp className="ml-2 h-4 w-4" />
-                      ) : (
-                        <ChevronDown className="ml-2 h-4 w-4" />
-                      )
-                    ) : (
-                      <ArrowUpDown className="ml-2 h-4 w-4" />
-                    )}
-                  </div>
-                </TableHead>
-              ))}
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredAndSortedTasks.map((task) => (
-              <TableRow key={task.id}>
-                {columns.find(col => col.key === 'select')?.isVisible && (
-                  <TableCell>
-                    <Checkbox
-                      checked={selectedTasks.has(task.id)}
-                      onCheckedChange={() => handleSelectTask(task.id)}
-                      aria-label={`Select task ${task.title}`}
-                    />
-                  </TableCell>
-                )}
-                {columns.filter(column => column.isVisible && column.key !== 'select').map(column => (
-                  <TableCell key={`${task.id}-${column.key}`}>
-                    {column.key === 'title' && task.title}
-                    {column.key === 'description' && (
-                      task?.description?.length as number > 20
-                        ? `${task?.description?.substring(0, 20)}...`
-                        : (task?.description || '')
-                    )}
-                    {column.key === 'start_time' && new Date(task.start_time as string).toLocaleString()}
-                    {column.key === 'end_time' && new Date(task.end_time as string).toLocaleString()}
-                    {column.key === 'status' && (
-                      <Badge className={`${getStatusColor(task.status)} hover:${getStatusHoverColor(task.status)}`}>
-                        {task.status}
-                      </Badge>
-                    )}
-                    {column.key === 'priority' && (
-                      <Badge className={`${getPriorityColor(task.priority)} hover:${getPriorityHoverColor (task.priority)}`}>
-                        {task.priority}
-                      </Badge>
-                    )}
-                  </TableCell>
-                ))}
-                <TableCell className="text-right">
-                  <div className="flex justify-end space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleViewDetail(task)}
-                      disabled={isPending}
-                    >
-                      {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Eye className="mr-2 h-4 w-4" />}
-                      View Detail
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleAnalyzeTask(task)}
-                      disabled={isPending}
-                    >
-                      <BarChart2 className="mr-2 h-4 w-4" />
-                      Analyze
-                    </Button>
-                  </div>
+                <TableCell key={`${task.id}-${column.key}`}>
+                  {column.key === 'title' && task.title}
+                  {column.key === 'description' && (
+                    task?.description?.length as number > 20
+                      ? `${task?.description?.substring(0, 20)}...`
+                      : (task?.description || '')
+                  )}
+                  {column.key === 'start_time' && new Date(task.start_time as string).toLocaleString()}
+                  {column.key === 'end_time' && new Date(task.end_time as string).toLocaleString()}
+                  {column.key === 'status' && (
+                    <Badge className={`${getStatusColor(task.status)} hover:${getStatusHoverColor(task.status)}`}>
+                      {task.status}
+                    </Badge>
+                  )}
+                  {column.key === 'priority' && (
+                    <Badge className={`${getPriorityColor(task.priority)} hover:${getPriorityHoverColor (task.priority)}`}>
+                      {task.priority}
+                    </Badge>
+                  )}
                 </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-          </Table>
-        </ScrollArea>
-      </div>
+              ))}
+              <TableCell className="text-right">
+                <div className="flex justify-end space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleViewDetail(task)}
+                    disabled={isPending}
+                  >
+                    {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Eye className="mr-2 h-4 w-4" />}
+                    View Detail
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleAnalyzeTask(task)}
+                    disabled={isPending}
+                  >
+                    <BarChart2 className="mr-2 h-4 w-4" />
+                    Analyze
+                  </Button>
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+      {/* <div className="h-[500px] w-full overflow-x-auto">
+        <ScrollArea className="h-full overflow-x-auto"> */}
+
+        {/* </ScrollArea>
+      </div> */}
 
       <TaskDetailModal
         task={selectedTask}
@@ -494,7 +497,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({ chatMode }) => {
         onUpdateTask={handleUpdateTask}
         isLoading={isPending}
       />
-    </div>
+    </>
   )
 }
 

@@ -31,7 +31,7 @@ const user = useSelector((state: RootState) => state.user);
   }
 
   return (
-    <nav className="flex items-center justify-between bg-sky-500 p-4 shadow-md">
+    <nav className="flex items-center justify-between bg-sky-500 p-4 shadow-md fixed top-0 left-0 right-0 z-10">
       <div className="text-xl font-bold text-white">
         <Link href="/">MyApp</Link>
       </div>

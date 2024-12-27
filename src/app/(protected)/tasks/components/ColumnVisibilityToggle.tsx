@@ -31,6 +31,7 @@ export function ColumnVisibilityToggle({ columns, onToggle }: ColumnVisibilityTo
         <DropdownMenuLabel>Toggle Columns</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {columns.map((column) => (
+          column.key  !== 'select' &&
           <DropdownMenuCheckboxItem
             key={column.key}
             checked={column.isVisible}

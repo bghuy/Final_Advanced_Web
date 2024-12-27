@@ -7,14 +7,12 @@ import { ChatMode } from './components/AIChatBox'
 export default function TaskManagerPage() {
   const [chatMode, setChatMode] = useState<ChatMode>('recommend')
   return (
-    <div className="container mx-auto py-10 px-2 h-full">
-      <div className="grid grid-cols-12 gap-4 h-full">
-        <div className = "h-full col-span-4">
-          <AIChatBox onModeChange={setChatMode} />
-        </div>
-        <div className = "col-span-8 h-full">
-          <TaskTable chatMode={chatMode} />
-        </div>
+    <div className="container mx-auto h-full my-auto py-2">
+      <div className="flex gap-x-4 h-[550px] md:flex-row flex-col gap-y-4">
+          <div className='min-w-[350px] min-h-[200px]'>
+            <AIChatBox onModeChange={setChatMode} />
+          </div>
+          <TaskTable chatMode={chatMode}/>
       </div>
     </div>
   )
