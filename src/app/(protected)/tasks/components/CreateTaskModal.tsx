@@ -31,7 +31,7 @@ export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: Cr
     mode: 'onChange'
   })
 
-  const status = watch('status')
+  const start_time = watch('start_time')
 
   const onSubmit = (data: CreateTaskType) => {
     const convertToISODateString = (date: string | undefined) => {
@@ -118,19 +118,25 @@ export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: Cr
               />
             </div>
           </div>
-          {/* <div className="grid grid-cols-4 items-center gap-4">
+          <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="end_time" className="text-right">
-              End Time
+              Deadline
             </Label>
             <div className="col-span-3">
               <Controller
                 name="end_time"
                 control={control}
                 render={({ field }) => <Input {...field} id="end_time" type="datetime-local" />}
+                rules={{
+                  required: "Deadline is required",
+                  validate: (value) => 
+                    !start_time || !value || new Date(value) >= new Date(start_time) || 
+                    "End time must be later than or equal to start time"
+                }}
               />
             </div>
-          </div> */}
-          <div className="grid grid-cols-4 items-center gap-4">
+          </div>
+          {/* <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="end_time" className="text-right">
               Deadline
             </Label>
@@ -143,7 +149,7 @@ export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: Cr
               />
               {errors.end_time && <p className="text-sm text-red-500 mt-1">{errors.end_time.message}</p>}
             </div>
-          </div>
+          </div> */}
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="priority" className="text-right">
               Priority
