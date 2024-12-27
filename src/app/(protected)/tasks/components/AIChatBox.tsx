@@ -20,7 +20,7 @@ type ChatMessage = {
 export type ChatMode = 'recommend' | 'set deadline'
 
 export function AIChatBox({ onModeChange }: { onModeChange: (mode: ChatMode) => void }) {
-  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [messages, setMessages] = useState<ChatMessage[]>([{id: "5FBFQBjS77", content: "Hello, I'm your AI assistant. How can I help you today?", isUser: false}])
   const [input, setInput] = useState('')
   const [mode, setMode] = useState<ChatMode>('recommend')
   const [isLoading, setIsLoading] = useState(false)
