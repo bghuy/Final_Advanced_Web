@@ -20,6 +20,7 @@ import { useState, useTransition } from "react"
 import { register } from "../../../actions/register"
 import { useRouter } from "next/navigation";
 import { DEFAULT_LOGIN_REDIRECT } from "@/routes"
+// import { useSearchParams } from "next/navigation"
 export const RegisterForm = () =>{
     const [isPending,startTransition] = useTransition();
     const [error,setError] = useState<string | undefined>("");
@@ -51,11 +52,12 @@ export const RegisterForm = () =>{
             }
         });
     };
+    const backButtonHref = `/auth/login`;
     return (
         <CardWrapper
             headerLabel="Create an account"
             backButtonLabel="Already have an account"
-            backButtonHref="/auth/login"
+            backButtonHref={backButtonHref}
             showSocial
         >
             <Form {...form}>

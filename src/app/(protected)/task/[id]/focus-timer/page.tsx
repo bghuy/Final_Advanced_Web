@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import { getTasks, editTask } from '../../../../../../actions/taskActions'
 import { Task } from '@/types/task'
 import { Button } from "@/components/ui/button"
@@ -19,7 +18,6 @@ export default function FocusTimerPage({ params }: { params: Promise<{ id: strin
   const [isRunning, setIsRunning] = useState(false)
   const [isBreak, setIsBreak] = useState(false)
   const [taskId, setTaskId] = useState<string | null>(null) // Store resolved ID here
-  const router = useRouter()
   const { toast } = useToast()
 
   // Resolve `params` and set `taskId`
@@ -62,7 +60,7 @@ export default function FocusTimerPage({ params }: { params: Promise<{ id: strin
   }, [isRunning, timeLeft])
 
   const startTimer = () => {
-    if (task?.status !== 'In Progress') {
+    if (task?.status !== 'in progress') {
       toast({
         title: "Cannot start timer",
         description: "The task must be in progress to start the timer.",
@@ -96,7 +94,7 @@ export default function FocusTimerPage({ params }: { params: Promise<{ id: strin
     if (!isBreak && task) {
       const updatedTask = {
         ...task,
-        focusSessions: (task.focusSessions || 0) + 1,
+        // focusSessions: (task.focusSessions || 0) + 1,
       }
       await editTask(updatedTask)
       setTask(updatedTask)
@@ -151,7 +149,7 @@ export default function FocusTimerPage({ params }: { params: Promise<{ id: strin
         </div>
         <div className="flex justify-center space-x-2">
           {!isRunning ? (
-            <Button onClick={startTimer} disabled={task.status !== 'In Progress'}>
+            <Button onClick={startTimer} disabled={task.status !== 'in progress'}>
               <Play className="mr-2 h-4 w-4" />
               Start Focus Timer
             </Button>

@@ -1,4 +1,4 @@
-import { useState } from "react"
+
 import { useForm, Controller } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -6,33 +6,47 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog"
-import { Task } from "@/types/task"
+import { CreateTaskType} from "@/types/task"
 import { Loader2 } from 'lucide-react'
 
 interface CreateTaskModalProps {
   isOpen: boolean
   onClose: () => void
-  onCreateTask: (task: Omit<Task, 'id' | 'created_at' | 'updated_at' | 'focusSessions'>) => void
+  onCreateTask: (newTask: CreateTaskType) => void
   isLoading: boolean
 }
 
-type FormData = Omit<Task, 'id' | 'created_at' | 'updated_at' | 'focusSessions'>
+// type FormData = Omit<Task, 'id' | 'created_at' | 'updated_at'>
 
 export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: CreateTaskModalProps) {
-  const { control, handleSubmit, formState: { errors, isValid } } = useForm<FormData>({
+  const { control, handleSubmit, watch, formState: { errors, isValid } } = useForm<CreateTaskType>({
     defaultValues: {
       title: '',
       description: '',
-      deadline: '',
-      status: 'Todo',
+      start_time: '',
+      end_time: '',
+      status: 'to do',
       priority: 'medium',
     },
     mode: 'onChange'
   })
 
-  const onSubmit = (data: FormData) => {
-    onCreateTask(data)
+  const start_time = watch('start_time')
+
+  const onSubmit = (data: CreateTaskType) => {
+    const convertToISODateString = (date: string | undefined) => {
+      if (date) {
+        const isoDate = new Date(date).toISOString();
+        return isoDate;
+      }
+      return undefined;
+    }
+  
+    data.start_time = convertToISODateString(data.start_time);
+    data.end_time = convertToISODateString(data.end_time);
+    onCreateTask(data);
   }
+  
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -67,20 +81,6 @@ export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: Cr
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="deadline" className="text-right">
-              Deadline
-            </Label>
-            <div className="col-span-3">
-              <Controller
-                name="deadline"
-                control={control}
-                rules={{ required: "Deadline is required" }}
-                render={({ field }) => <Input {...field} id="deadline" type="date" />}
-              />
-              {errors.deadline && <p className="text-sm text-red-500 mt-1">{errors.deadline.message}</p>}
-            </div>
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="status" className="text-right">
               Status
             </Label>
@@ -95,10 +95,10 @@ export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: Cr
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Todo">Todo</SelectItem>
-                      <SelectItem value="In Progress">In Progress</SelectItem>
-                      <SelectItem value="Completed">Completed</SelectItem>
-                      <SelectItem value="Expired">Expired</SelectItem>
+                      <SelectItem value="to do">Todo</SelectItem>
+                      <SelectItem value="in progress">in progress</SelectItem>
+                      <SelectItem value="completed">Completed</SelectItem>
+                      <SelectItem value="expired">Expired</SelectItem>
                     </SelectContent>
                   </Select>
                 )}
@@ -106,6 +106,59 @@ export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: Cr
               {errors.status && <p className="text-sm text-red-500 mt-1">{errors.status.message}</p>}
             </div>
           </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="start_time" className="text-right">
+              Start Time
+            </Label>
+            <div className="col-span-3">
+              <Controller
+                name="start_time"
+                control={control}
+                render={({ field }) => <Input {...field} id="start_time" type="datetime-local" />}
+                rules={{
+                  required: "Start time is required",
+                  validate: (value) => {
+                    if (!value) return "Start time is required";
+                    const selectedDate = new Date(value);
+                    const now = new Date();
+                    return selectedDate >= now || "Start time must be greater than or equal to the current date and time";
+                  },
+                }}
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="end_time" className="text-right">
+              Deadline
+            </Label>
+            <div className="col-span-3">
+              <Controller
+                name="end_time"
+                control={control}
+                render={({ field }) => <Input {...field} id="end_time" type="datetime-local" />}
+                rules={{
+                  required: "Deadline is required",
+                  validate: (value) => 
+                    !start_time || !value || new Date(value) >= new Date(start_time) || 
+                    "End time must be later than or equal to start time"
+                }}
+              />
+            </div>
+          </div>
+          {/* <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="end_time" className="text-right">
+              Deadline
+            </Label>
+            <div className="col-span-3">
+              <Controller
+                name="end_time"
+                control={control}
+                rules={{ required: status !== 'to do' ? "Deadline is required" : false }}
+                render={({ field }) => <Input {...field} id="end_time" type="datetime-local" />}
+              />
+              {errors.end_time && <p className="text-sm text-red-500 mt-1">{errors.end_time.message}</p>}
+            </div>
+          </div> */}
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="priority" className="text-right">
               Priority

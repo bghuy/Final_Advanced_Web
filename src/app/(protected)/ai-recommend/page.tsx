@@ -4,9 +4,10 @@ import { useState, useEffect } from 'react'
 import { getRecommendedTasks } from '../../../../actions/getRecommendedTasks'
 import TaskSidebar from './components/TaskSidebar'
 import ChatBox from './components/ChatBox'
+import { Task } from '@/types/task'
 
 export default function AIRecommendPage() {
-  const [tasks, setTasks] = useState([])
+  const [tasks, setTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {

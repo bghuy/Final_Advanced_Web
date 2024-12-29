@@ -30,7 +30,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         style={{height: "100vh"}}
       >
-        <ReduxProvider>{children}</ReduxProvider>
+        <ReduxProvider>
+          {/* <Navbar/> */}
+          {children}
+        </ReduxProvider>
       </body>
     </html>
   );

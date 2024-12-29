@@ -18,20 +18,32 @@ interface EditTaskModalProps {
 }
 
 export function EditTaskModal({ task, isOpen, onClose, onUpdateTask, isLoading }: EditTaskModalProps) {
-  const { control, handleSubmit, reset, formState: { errors, isValid } } = useForm<Task>({
+  const { control, handleSubmit, reset, watch, formState: { errors, isValid } } = useForm<Task>({
     defaultValues: task || {},
     mode: 'onChange'
   })
 
+  const status = watch('status')
+
   useEffect(() => {
     if (task) {
-      reset(task)
+      reset({
+        ...task,
+        start_time: formatDateForInput(task.start_time),
+        end_time: formatDateForInput(task.end_time),
+      })
     }
   }, [task, reset])
 
   const onSubmit = (data: Task) => {
     if (task) {
-      onUpdateTask({ ...task, ...data, updated_at: new Date().toISOString() })
+      onUpdateTask({ 
+        ...task, 
+        ...data, 
+        start_time: formatDateForServer(data.start_time),
+        end_time: formatDateForServer(data.end_time),
+        updated_at: new Date().toISOString() 
+      })
     }
   }
 
@@ -69,20 +81,6 @@ export function EditTaskModal({ task, isOpen, onClose, onUpdateTask, isLoading }
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="edit-deadline" className="text-right">
-              Deadline
-            </Label>
-            <div className="col-span-3">
-              <Controller
-                name="deadline"
-                control={control}
-                rules={{ required: "Deadline is required" }}
-                render={({ field }) => <Input {...field} id="edit-deadline" type="date" />}
-              />
-              {errors.deadline && <p className="text-sm text-red-500 mt-1">{errors.deadline.message}</p>}
-            </div>
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="edit-status" className="text-right">
               Status
             </Label>
@@ -97,15 +95,41 @@ export function EditTaskModal({ task, isOpen, onClose, onUpdateTask, isLoading }
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Todo">Todo</SelectItem>
-                      <SelectItem value="In Progress">In Progress</SelectItem>
-                      <SelectItem value="Completed">Completed</SelectItem>
-                      <SelectItem value="Expired">Expired</SelectItem>
+                      <SelectItem value="to do">Todo</SelectItem>
+                      <SelectItem value="in progress">In Progress</SelectItem>
+                      <SelectItem value="completed">Completed</SelectItem>
+                      <SelectItem value="expired">Expired</SelectItem>
                     </SelectContent>
                   </Select>
                 )}
               />
               {errors.status && <p className="text-sm text-red-500 mt-1">{errors.status.message}</p>}
+            </div>
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="edit-start_time" className="text-right">
+              Start Time
+            </Label>
+            <div className="col-span-3">
+              <Controller
+                name="start_time"
+                control={control}
+                render={({ field }) => <Input {...field} id="edit-start_time" type="datetime-local" />}
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="edit-end_time" className="text-right">
+              Deadline
+            </Label>
+            <div className="col-span-3">
+              <Controller
+                name="end_time"
+                control={control}
+                rules={{ required: status !== 'to do' ? "Deadline is required" : false }}
+                render={({ field }) => <Input {...field} id="edit-end_time" type="datetime-local" />}
+              />
+              {errors.end_time && <p className="text-sm text-red-500 mt-1">{errors.end_time.message}</p>}
             </div>
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
@@ -149,5 +173,17 @@ export function EditTaskModal({ task, isOpen, onClose, onUpdateTask, isLoading }
       </DialogContent>
     </Dialog>
   )
+}
+
+function formatDateForInput(dateString: string | undefined): string {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  return date.toISOString().slice(0, 16)
+}
+
+function formatDateForServer(dateString: string | undefined): string {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  return date.toISOString()
 }
 

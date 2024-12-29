@@ -43,13 +43,13 @@ export default function TaskPage() {
 
   const getStatusColor = (status: Task['status']) => {
     switch (status) {
-      case 'Todo':
+      case 'to do':
         return 'bg-yellow-500'
-      case 'In Progress':
+      case 'in progress':
         return 'bg-blue-500'
-      case 'Completed':
+      case 'completed':
         return 'bg-green-500'
-      case 'Expired':
+      case 'expired':
         return 'bg-red-500'
       default:
         return 'bg-gray-500'
@@ -79,6 +79,7 @@ export default function TaskPage() {
         description: "The task has been successfully updated.",
       })
     } catch (error) {
+      console.log(error);
       toast({
         title: "Error",
         description: "Failed to update the task. Please try again.",
@@ -97,6 +98,7 @@ export default function TaskPage() {
       })
       router.push('/')
     } catch (error) {
+      console.log(error);
       toast({
         title: "Error",
         description: "Failed to delete the task. Please try again.",
@@ -120,7 +122,7 @@ export default function TaskPage() {
           <label className="block text-gray-700 text-sm font-bold mb-2">
             Deadline
           </label>
-          <p className="text-gray-700 text-base">{new Date(task.deadline).toLocaleDateString()}</p>
+          <p className="text-gray-700 text-base">{new Date(task.end_time as string).toLocaleDateString()}</p>
         </div>
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2">
@@ -154,7 +156,7 @@ export default function TaskPage() {
           <label className="block text-gray-700 text-sm font-bold mb-2">
             Focus Sessions
           </label>
-          <p className="text-gray-700 text-base">{task.focusSessions}</p>
+          {/* <p className="text-gray-700 text-base">{task.focusSessions}</p> */}
         </div>
         <div className="flex justify-end space-x-2 mt-4">
           <Button variant="outline" onClick={() => setIsEditModalOpen(true)}>
@@ -175,7 +177,7 @@ export default function TaskPage() {
             )}
           </Button>
           <Link href={`/task/${task.id}/focus-timer`} passHref>
-            <Button variant="default" disabled={task.status !== 'In Progress'}>
+            <Button variant="default" disabled={task.status !== 'in progress'}>
               <Timer className="mr-2 h-4 w-4" />
               Focus Timer
             </Button>
