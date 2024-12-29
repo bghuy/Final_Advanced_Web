@@ -37,3 +37,13 @@ export type UpdateTaskPutType = {
   title: string,
 }
 
+export type TaskIdResponse = {
+  id: string;
+  title: string;
+  description?: string;
+  start_time?: string;
+  end_time?: string;
+  status: 'to do' | 'in progress' | 'completed' | 'expired';
+  priority: 'high' | 'medium' | 'low';
+}
+

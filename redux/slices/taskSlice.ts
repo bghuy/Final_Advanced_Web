@@ -1,28 +1,37 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-
+import { Task } from '@/types/task';
 interface TaskState {
-  username: string,
-  email: string,
-  id: string,
+  tasks: Task[];
+  selectedTaskIds: string[];
 }
 
+
 const initialState: TaskState = {
-  username: '',
-  email: '',
-  id: '',
+  tasks: [],
+  selectedTaskIds: [],
 };
 
 const taskSlice = createSlice({
-  name: 'user',
+  name: 'task',
   initialState,
   reducers: {
-    setTaskList: (state, action: PayloadAction<{ username: string, email: string, id: string }>) => {
-      state.username = action.payload.username;
-      state.email = action.payload.email;
-      state.id = action.payload.id;
+    setTaskList: (state, action: PayloadAction<{ tasks: Task[] }>) => {
+      state.tasks = action.payload.tasks;
     },
+    setSelectedTaskIds: (state, action: PayloadAction<string[]>) => {
+      state.selectedTaskIds = action.payload;
+    },
+    addSelectedTaskId: (state, action: PayloadAction<string>) => {
+      state.selectedTaskIds.push(action.payload);
+    },
+    removeSelectedTaskId: (state, action: PayloadAction<string>) => {
+      state.selectedTaskIds = state.selectedTaskIds.filter(id => id !== action.payload);
+    },
+    clearSelectedTaskIds: (state) => {
+      state.selectedTaskIds = [];
+    }
   },
 });
 
-export const { setTaskList } = taskSlice.actions;
+export const { setTaskList, addSelectedTaskId,removeSelectedTaskId, clearSelectedTaskIds, setSelectedTaskIds   } = taskSlice.actions;
 export default taskSlice.reducer;
