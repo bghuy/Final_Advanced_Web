@@ -18,10 +18,13 @@ import { EditTaskModal } from "./EditTaskModal"
 import { DateFilterButton } from "./DateFilterButton"
 import { ColumnVisibilityToggle } from "./ColumnVisibilityToggle"
 import { getFirstDayOfMonth, getLastDayOfMonth } from "@/lib/utils"
+import { useDispatch } from 'react-redux';
+import { setSelectedTaskIds} from "../../../../../redux/slices/taskSlice"
 // import { ScrollArea } from "@/components/ui/scroll-area"
 // import { ISODateString } from "@/types/ISODateString"
 interface TaskTableProps {
   chatMode: 'recommend' | 'set deadline'
+  refreshCount: number
 }
 
 type SortConfig = {
@@ -31,7 +34,7 @@ type SortConfig = {
 
 type DateFilterField =  'start_time' | 'end_time';
 
-export const TaskTable: React.FC<TaskTableProps> = ({ chatMode }) => {
+export const TaskTable: React.FC<TaskTableProps> = ({ chatMode, refreshCount }) => {
   const [tasks, setTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -60,7 +63,13 @@ export const TaskTable: React.FC<TaskTableProps> = ({ chatMode }) => {
   const now = new Date();
   const [startDate, setStartDate] = useState<Date | undefined>(new Date(getFirstDayOfMonth(now)));
   const [endDate, setEndDate] = useState<Date | undefined >(new Date(getLastDayOfMonth(now)));
+  const dispatch = useDispatch();
+  
 
+
+  useEffect(() => {
+    dispatch(setSelectedTaskIds(Array.from(selectedTasks)));
+  }, [selectedTasks, dispatch])
 
   const fetchTasks = useCallback(async () => {
     try {
@@ -82,7 +91,10 @@ export const TaskTable: React.FC<TaskTableProps> = ({ chatMode }) => {
   };
 
   useEffect(() => {
-    console.log("1");
+    fetchTasks()
+  }, [fetchTasks, refreshCount])
+
+  useEffect(() => {
     fetchTasks()
   }, [fetchTasks])
 
@@ -313,7 +325,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({ chatMode }) => {
   }
 
   if (loading) {
-    return <Spinner />
+    return <div className="flex flex-col w-full h-full"><Spinner /></div>
   }
 
   if (error) {

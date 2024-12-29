@@ -7,8 +7,6 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function getFirstDayOfMonth(date: Date | undefined) {
-  console.log(date, "date");
-  
   const currentDate = date ?? new Date();
   const firstDayOfMonth = new Date(Date.UTC(currentDate.getUTCFullYear(), currentDate.getUTCMonth(), 1, 0, 0, 1));
   return formatDateWithoutMilliseconds(firstDayOfMonth);

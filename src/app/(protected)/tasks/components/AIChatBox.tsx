@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -9,7 +9,11 @@ import { Task } from "@/types/task"
 import { Badge } from "@/components/ui/badge"
 import { Loader2, Send } from 'lucide-react'
 import { TaskDetailModal } from "./TaskDetailModal"
-
+import { getAIResponse } from '../../../../../actions/AI/getAiRecommend'
+import { useSelector} from 'react-redux';
+import { RootState } from '../../../../../redux/store'
+import ReactMarkdown from 'react-markdown';
+import { createNewTask, updatedTask } from '../../../../../actions/taskActions'
 type ChatMessage = {
   id: string
   content: string
@@ -19,58 +23,92 @@ type ChatMessage = {
 
 export type ChatMode = 'recommend' | 'set deadline'
 
-export function AIChatBox({ onModeChange }: { onModeChange: (mode: ChatMode) => void }) {
+export function AIChatBox({ onModeChange, onRequestRefresh }: { onModeChange: (mode: ChatMode) => void, onRequestRefresh: ()=> void }) {
   const [messages, setMessages] = useState<ChatMessage[]>([{id: "5FBFQBjS77", content: "Hello, I'm your AI assistant. How can I help you today?", isUser: false}])
   const [input, setInput] = useState('')
   const [mode, setMode] = useState<ChatMode>('recommend')
   const [isLoading, setIsLoading] = useState(false)
-  const [selectedColumn, setSelectedColumn] = useState<string>('end_time')
+  const [selectedColumn, setSelectedColumn] = useState<string>('standard')
   const [isTaskDetailModalOpen, setIsTaskDetailModalOpen] = useState(false)
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
 
+  const previousModeRef = useRef<ChatMode | null>(null);
+  const tasks = useSelector((state: RootState) => state.task);
+  useEffect(() => {
+    if (previousModeRef.current !== null && previousModeRef.current !== mode) {
+      setMessages([{id: "5FBFQBjS77", content: "Hello, I'm your AI assistant. How can I help you today?", isUser: false}])
+    }
+    previousModeRef.current = mode;
+  }, [mode]);
   const handleSendMessage = async () => {
     if (input.trim() === '') return
 
     setIsLoading(true)
+    const body: { content: string; task_ids?: string[] } = {
+      content: input,
+    }
+    if(tasks.selectedTaskIds.length) {
+      body.task_ids = [...tasks.selectedTaskIds]
+    }
+
+    const response = await getAIResponse(body);
+
+    console.log(response, "res");
+    
     const userMessage: ChatMessage = { id: Date.now().toString(), content: input, isUser: true }
     setMessages(prev => [...prev, userMessage])
     setInput('')
 
     // Simulate AI response
-    await new Promise(resolve => setTimeout(resolve, 1000))
 
     const aiMessage: ChatMessage = {
       id: (Date.now() + 1).toString(),
-      content: `Here are some ${mode === 'recommend' ? 'recommended tasks' : 'tasks with updated deadlines'} based on your input:`,
-      isUser: false,
-      tasks: generateMockTasks(mode)
+      content: response.content || (mode === "set deadline" ? 'Please check all task modifications' : 'Sorry, I could not generate a response.'),
+      isUser: false, 
+      tasks: response.tasks?.map((task, index) => ({
+        ...task,
+        id: task.id || `${Date.now()}-${index}`,
+      })) || [],
     }
     setMessages(prev => [...prev, aiMessage])
     setIsLoading(false)
   }
+  // const generateMockTasks = (mode: ChatMode): Task[] => {
+  //   const statuses: Task['status'][] = ['to do', 'in progress', 'completed', 'expired']
+  //   const priorities: Task['priority'][] = ['high', 'medium', 'low']
 
-  const generateMockTasks = (mode: ChatMode): Task[] => {
-    const statuses: Task['status'][] = ['to do', 'in progress', 'completed', 'expired']
-    const priorities: Task['priority'][] = ['high', 'medium', 'low']
+  //   return Array.from({ length: 3 }, (_, i) => ({
+  //     id: (Date.now() + i).toString(),
+  //     title: `Task ${i + 1}`,
+  //     description: 'This is a mock task description',
+  //     status: statuses[Math.floor(Math.random() * statuses.length)],
+  //     priority: priorities[Math.floor(Math.random() * priorities.length)],
+  //     end_time: mode === 'set deadline' 
+  //       ? new Date(Date.now() + Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString()
+  //       : new Date(Date.now() + Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
+  //     created_at: new Date().toISOString(),
+  //     updated_at: new Date().toISOString(),
+  //   }))
+  // }
 
-    return Array.from({ length: 3 }, (_, i) => ({
-      id: (Date.now() + i).toString(),
-      title: `Task ${i + 1}`,
-      description: 'This is a mock task description',
-      status: statuses[Math.floor(Math.random() * statuses.length)],
-      priority: priorities[Math.floor(Math.random() * priorities.length)],
-      end_time: mode === 'set deadline' 
-        ? new Date(Date.now() + Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString()
-        : new Date(Date.now() + Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    }))
-  }
-
-  const handleAcceptTask = (taskId: string) => {
+  const handleAcceptTask = async(task: Task & {created_at?: string; updated_at?: string;}, messageId: string) => {
     // Here you would typically update the task in your state or database
-    console.log(`Task ${taskId} accepted`)
-  }
+    try {
+      if(mode === 'recommend'){
+        await createNewTask(task)
+      }
+      else if(mode === 'set deadline') {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { created_at, updated_at, ...taskWithoutCreatedAt } = task;
+        console.log(taskWithoutCreatedAt, "taskWithoutCreatedAt");
+        await updatedTask(taskWithoutCreatedAt);
+      }
+      onRequestRefresh();
+      handleDeclineTask(messageId, task.id);
+    } catch (error) {
+      console.log(error);
+    }
+  } 
 
   const handleDeclineTask = (messageId: string, taskId: string) => {
     setMessages(prevMessages => 
@@ -112,7 +150,7 @@ export function AIChatBox({ onModeChange }: { onModeChange: (mode: ChatMode) => 
         {messages.map(message => (
           <div key={message.id} className={`mb-4 ${message.isUser ? 'text-right' : 'text-left'}`}>
             <div className={`inline-block p-2 rounded-lg ${message.isUser ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>
-              {message.content}
+              <ReactMarkdown>{message.content}</ReactMarkdown>
             </div>
             {message.tasks && (
               <div className="mt-2 space-y-2">
@@ -121,7 +159,7 @@ export function AIChatBox({ onModeChange }: { onModeChange: (mode: ChatMode) => 
                     <div className="flex justify-between items-center mb-2">
                       <h3 className="font-bold truncate">{task.title}</h3>
                       <div className="flex space-x-1">
-                        <Button size="sm" variant="outline" onClick={() => handleAcceptTask(task.id)}>Accept</Button>
+                        <Button size="sm" variant="outline" onClick={() => handleAcceptTask(task, message.id)}>Accept</Button>
                         <Button size="sm" variant="outline" onClick={() => handleDeclineTask(message.id, task.id)}>Decline</Button>
                       </div>
                     </div>
@@ -151,7 +189,7 @@ export function AIChatBox({ onModeChange }: { onModeChange: (mode: ChatMode) => 
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Type your message..."
-            onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+            onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
           />
           <Button onClick={handleSendMessage} disabled={isLoading}>
             {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
@@ -176,8 +214,8 @@ export function AIChatBox({ onModeChange }: { onModeChange: (mode: ChatMode) => 
                 <SelectValue placeholder="Select column" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="end_time">Deadline</SelectItem>
-                <SelectItem value="start_time">Start Time</SelectItem>
+                <SelectItem value="standard">Standard</SelectItem>
+                {/* <SelectItem value="start_time">Start Time</SelectItem> */}
               </SelectContent>
             </Select>
           )}
@@ -191,6 +229,7 @@ export function AIChatBox({ onModeChange }: { onModeChange: (mode: ChatMode) => 
         onDelete={() => {}}
         isLoading={false}
         onOpenEditModal={() => {}}
+        hideAllActions={true}
       />
     </div>
   )
