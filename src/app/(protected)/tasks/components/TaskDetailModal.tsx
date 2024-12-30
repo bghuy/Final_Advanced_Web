@@ -55,7 +55,7 @@ export function TaskDetailModal({ task, isOpen, onClose, onEdit, onDelete, hideA
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold">{task.title}</DialogTitle>
-          <DialogDescription>View task details.</DialogDescription>
+          <DialogDescription></DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div>

@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
 import { TaskDetailModal } from "./TaskDetailModal"
 import { CreateTaskType, Task } from "@/types/task"
-import { Eye, ChevronUp, ChevronDown, Plus, Loader2, ArrowUpDown, BarChart2 } from 'lucide-react'
+import { Eye, ChevronUp, ChevronDown, Plus, Loader2, ArrowUpDown, ClockIcon } from 'lucide-react'
 import { fetchTaskList, createNewTask, updatedTask, removeTask } from "./../../../../../actions/taskActions"
 import { useToast } from "@/hooks/use-toast"
 import { CreateTaskModal } from "./CreateTaskModal"
@@ -475,8 +475,8 @@ export const TaskTable: React.FC<TaskTableProps> = ({ chatMode, refreshCount }) 
                     onClick={() => handleAnalyzeTask(task)}
                     disabled={isPending}
                   >
-                    <BarChart2 className="mr-2 h-4 w-4" />
-                    Analyze
+                    <ClockIcon className="mr-2 h-4 w-4" />
+                    Focus timer
                   </Button>
                 </div>
               </TableCell>
