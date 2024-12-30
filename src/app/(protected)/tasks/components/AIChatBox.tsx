@@ -73,24 +73,6 @@ export function AIChatBox({ onModeChange, onRequestRefresh }: { onModeChange: (m
     setMessages(prev => [...prev, aiMessage])
     setIsLoading(false)
   }
-  // const generateMockTasks = (mode: ChatMode): Task[] => {
-  //   const statuses: Task['status'][] = ['to do', 'in progress', 'completed', 'expired']
-  //   const priorities: Task['priority'][] = ['high', 'medium', 'low']
-
-  //   return Array.from({ length: 3 }, (_, i) => ({
-  //     id: (Date.now() + i).toString(),
-  //     title: `Task ${i + 1}`,
-  //     description: 'This is a mock task description',
-  //     status: statuses[Math.floor(Math.random() * statuses.length)],
-  //     priority: priorities[Math.floor(Math.random() * priorities.length)],
-  //     end_time: mode === 'set deadline' 
-  //       ? new Date(Date.now() + Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString()
-  //       : new Date(Date.now() + Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
-  //     created_at: new Date().toISOString(),
-  //     updated_at: new Date().toISOString(),
-  //   }))
-  // }
-
   const handleAcceptTask = async(task: Task & {created_at?: string; updated_at?: string;}, messageId: string) => {
     // Here you would typically update the task in your state or database
     try {
