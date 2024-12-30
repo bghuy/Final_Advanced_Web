@@ -37,7 +37,7 @@ export default function Navbar() {
     <nav className="flex items-center justify-between bg-gradient-to-r from-blue-500 to-purple-600 p-4 shadow-lg fixed top-0 left-0 right-0 z-10">
       <div className="text-white flex items-center space-x-6">
         <Link className='text-2xl font-bold hover:text-blue-200 transition-colors duration-200' href="/tasks">
-          MyApp
+          AI Study Planner
         </Link>
         <div className="hidden md:flex space-x-4">
           <Link 
