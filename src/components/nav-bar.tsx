@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import {User, LogOut, BarChart } from 'lucide-react'
+import {User, LogOut, BarChart, Settings } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { useSelector } from 'react-redux'
 import type { RootState } from './../../redux/store'
@@ -69,6 +69,10 @@ export default function Navbar() {
             <span className="text-sm text-gray-500">{user?.email}</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
+          <DropdownMenuItem>
+            <Settings className="mr-2 h-4 w-4" />
+            <Link href="/setting">Setting</Link>
+          </DropdownMenuItem>
           <DropdownMenuItem onSelect={handleLogout} className="text-red-600 focus:text-red-600">
             <LogOut className="mr-2 h-4 w-4" />
             <span>Log out</span>
