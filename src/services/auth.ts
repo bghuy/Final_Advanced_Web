@@ -19,3 +19,38 @@ export const registerService = async (values: RegisterRequest) => {
         throw error;
     }
 };
+
+export const sendOtp = async () => {
+    try {
+        const response = await axios.post("/auth/send-otp");
+        return response.data;
+    } catch (error) {
+        console.log("send otp Error", error);
+        throw error;
+    }
+};
+
+export const verifyOtp = async (otp: string) => {
+    try {
+        const response = await axios.post("/auth/verify-otp", {
+            otp,
+        });
+        return response.data;
+    } catch (error) {
+        console.log("verify otp Error", error);
+        throw error;
+    }
+};
+
+export const changePassword = async (new_password: string, old_password: string) => {
+    try {
+        const response = await axios.put("/auth/change-password", {
+            new_password,
+            old_password
+        });
+        return response.data;
+    } catch (error) {
+        console.log("change password Error", error);
+        throw error;
+    }
+};

@@ -28,6 +28,7 @@
     "clsx": "^2.1.1",
     "cookies-next": "^5.0.2",
     "date-fns": "^2.30.0",
+    "input-otp": "^1.4.1",
     "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.462.0",
