@@ -19,10 +19,10 @@ import { sendOtp, verifyOtp } from '@/services/auth';
 import { getUserProfileFromCookie } from '../../../../../actions/getUserProfileFromCookie';
 import { setUserInfo } from '../../../../../redux/slices/userSlice';
 
-const DEFAULT_EMAIL = 'admin@gmail.com';
+// const DEFAULT_EMAIL = 'admin@gmail.com';
 
 export default function VerifyEmail() {
-  const [email, setEmail] = useState(DEFAULT_EMAIL);
+  // const [email, setEmail] = useState(DEFAULT_EMAIL);
   const [otp, setOtp] = useState('');
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -34,10 +34,10 @@ export default function VerifyEmail() {
     e.preventDefault();
     
     setError('');
-    if (email !== user.email) {
-      setError('Not your account email. Please use the correct email address.');
-      return;
-    }
+    // if (email !== user.email) {
+    //   setError('Not your account email. Please use the correct email address.');
+    //   return;
+    // }
     // Pretend to call API to send OTP 
     try {
       setLoading(true);
@@ -100,84 +100,95 @@ export default function VerifyEmail() {
 
   return (
     <Card className="w-full max-w-md mx-auto">
-      <CardContent className = "py-4">
-        {renderStepIndicator()}
-        {step === 1 && (
-          <form onSubmit={handleSendOtp} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium text-gray-700">
-                Email
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full"
-              />
-            </div>
-            {error && (
-              <Alert variant="destructive">
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-            <Button
-              disabled={loading}  
-              type="submit"
-              className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-2 px-4 rounded-md hover:from-blue-600 hover:to-purple-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-            >
-              <Mail className="mr-2 h-4 w-4" />
-              Send OTP
-            </Button>
-          </form>
-        )}
-        {step === 2 && (
-          <form onSubmit={handleVerifyOtp} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="otp" className="text-sm font-medium text-gray-700">
-                Enter OTP
-              </Label>
-              <InputOTP 
-                maxLength={6} 
-                pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
-                value={otp}
-                onChange={setOtp}
-              >
-                <InputOTPGroup>
-                  <InputOTPSlot index={0} />
-                  <InputOTPSlot index={1} />
-                  <InputOTPSlot index={2} />
-                  <InputOTPSlot index={3} />
-                  <InputOTPSlot index={4} />
-                  <InputOTPSlot index={5} />
-                </InputOTPGroup>
-              </InputOTP>
-            </div>
-            {error && (
-              <Alert variant="destructive">
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-            <Button
-              disabled={loading}
-              type="submit"
-              className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-2 px-4 rounded-md hover:from-blue-600 hover:to-purple-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-            >
-              <CheckCircle className="mr-2 h-4 w-4" />
-              Verify OTP
-            </Button>
-          </form>
-        )}
-        {step === 3 && (
+      {user.verified ? 
+        <CardContent className = "py-4">
           <Alert className="bg-green-100 border-green-500">
-            <AlertDescription className="text-green-700 flex items-center">
-              <CheckCircle className="mr-2 h-4 w-4" />
-              Email verified successfully!
+            <AlertDescription className="text-green-700">
+              Your email has been verified.
             </AlertDescription>
           </Alert>
-        )}
-      </CardContent>
+        </CardContent>
+        :
+        <CardContent className = "py-4">
+          {renderStepIndicator()}
+          {step === 1 && (
+            <form onSubmit={handleSendOtp} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+                  Email
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={user.email}
+                  // onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="w-full"
+                  disabled= {true}
+                />
+              </div>
+              {error && (
+                <Alert variant="destructive">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+              <Button
+                disabled={loading}  
+                type="submit"
+                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-2 px-4 rounded-md hover:from-blue-600 hover:to-purple-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+              >
+                <Mail className="mr-2 h-4 w-4" />
+                Send OTP
+              </Button>
+            </form>
+          )}
+          {step === 2 && (
+            <form onSubmit={handleVerifyOtp} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="otp" className="text-sm font-medium text-gray-700">
+                  Enter OTP
+                </Label>
+                <InputOTP 
+                  maxLength={6} 
+                  pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
+                  value={otp}
+                  onChange={setOtp}
+                >
+                  <InputOTPGroup>
+                    <InputOTPSlot index={0} />
+                    <InputOTPSlot index={1} />
+                    <InputOTPSlot index={2} />
+                    <InputOTPSlot index={3} />
+                    <InputOTPSlot index={4} />
+                    <InputOTPSlot index={5} />
+                  </InputOTPGroup>
+                </InputOTP>
+              </div>
+              {error && (
+                <Alert variant="destructive">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+              <Button
+                disabled={loading}
+                type="submit"
+                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-2 px-4 rounded-md hover:from-blue-600 hover:to-purple-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+              >
+                <CheckCircle className="mr-2 h-4 w-4" />
+                Verify OTP
+              </Button>
+            </form>
+          )}
+          {step === 3 && (
+            <Alert className="bg-green-100 border-green-500">
+              <AlertDescription className="text-green-700 flex items-center">
+                <CheckCircle className="mr-2 h-4 w-4" />
+                Email verified successfully!
+              </AlertDescription>
+            </Alert>
+          )}
+        </CardContent>
+      }
     </Card>
   );
 }
