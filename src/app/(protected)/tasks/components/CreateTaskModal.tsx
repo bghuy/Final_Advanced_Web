@@ -19,7 +19,7 @@ interface CreateTaskModalProps {
 // type FormData = Omit<Task, 'id' | 'created_at' | 'updated_at'>
 
 export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: CreateTaskModalProps) {
-  const { control, handleSubmit, watch, formState: { errors, isValid } } = useForm<CreateTaskType>({
+  const { control, handleSubmit, watch, reset, formState: { errors, isValid } } = useForm<CreateTaskType>({
     defaultValues: {
       title: '',
       description: '',
@@ -45,6 +45,7 @@ export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: Cr
     data.start_time = convertToISODateString(data.start_time);
     data.end_time = convertToISODateString(data.end_time);
     onCreateTask(data);
+    reset();
   }
   
 
