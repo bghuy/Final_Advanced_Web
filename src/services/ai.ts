@@ -15,3 +15,8 @@ export const getTaskAnalysis = async (start_time: string, end_time: string) => {
     const response = await axios.post('/ai/analyze-schedule', { start_time, end_time })
     return response.data
 }
+
+export const getAiFeedbackSchedule = async (start_time: string, end_time: string) => {
+    const response = await axios.post('/ai/analyze-feedback-schedule', { start_time, end_time })
+    return response.data
+}

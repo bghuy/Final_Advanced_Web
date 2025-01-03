@@ -9,6 +9,7 @@ import { TaskStatuses } from './TaskStatuses'
 import { Button } from "@/components/ui/button"
 import { BarChartIcon, CalendarIcon, ClockIcon, ListTodoIcon, TrendingUpIcon } from 'lucide-react'
 import { getAIAnalyzeSchedule, getCountAllStatus, getCountDailyDuration } from '@/services/analytics'
+import { getAiFeedbackSchedule } from '@/services/ai'
 
 type DateFilterField = 'start_time' | 'end_time';
 
@@ -32,6 +33,7 @@ export default function AnalyzeSchedule() {
   const [dateFilterField, setDateFilterField] = useState<DateFilterField>('start_time')
   const [dailyDurations, setDailyDurations] = useState<DailyDuration[]>([])
   const [aiAnalysis, setAiAnalysis] = useState<string | null>(null)
+  const [scheduleAnalysis, setScheduleAnalysis] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [taskStatuses, setTaskStatuses] = useState<TaskStatus[]>([])
@@ -52,18 +54,21 @@ export default function AnalyzeSchedule() {
         const startTimeParam = formatDateTime(startDate)
         const endTimeParam = formatDateTime(endDate)
 
-        const [dailyDurationsResponse, aiAnalysisResponse] = await Promise.all([
+        const [dailyDurationsResponse, aiAnalysisResponse, allTaskStatuses] = await Promise.all([
             getCountDailyDuration(startTimeParam, endTimeParam),
-            getAIAnalyzeSchedule(startTimeParam, endTimeParam),
+            getAiFeedbackSchedule(startTimeParam, endTimeParam),
+            getCountAllStatus(startTimeParam, endTimeParam)
         ])
         console.log(dailyDurationsResponse,aiAnalysisResponse);
         
 
         const dailyDurationsData = await dailyDurationsResponse
         const aiAnalysisData = await aiAnalysisResponse
+        const TaskStatuses = await allTaskStatuses
 
         setDailyDurations(dailyDurationsData)
         setAiAnalysis(aiAnalysisData.content)
+        setTaskStatuses(TaskStatuses)
 
     } catch (error: unknown) {
         console.error('Error fetching data:', error)
@@ -81,9 +86,9 @@ export default function AnalyzeSchedule() {
     const startTimeParam = formatDateTime(startDate)
     const endTimeParam = formatDateTime(endDate)
 
-        const response = await getCountAllStatus(startTimeParam, endTimeParam)
+        const response = await getAIAnalyzeSchedule(startTimeParam, endTimeParam)
 
-        setTaskStatuses(response)
+        setScheduleAnalysis(response?.content || '')
 
     } catch (error) {
       console.error('Error fetching task status data:', error)
@@ -123,8 +128,8 @@ export default function AnalyzeSchedule() {
       <CardContent className="space-y-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="schedule">Schedule Analysis</TabsTrigger>
-            <TabsTrigger value="tasks">Task Statuses</TabsTrigger>
+            <TabsTrigger value="schedule">AI Feedbacks</TabsTrigger>
+            <TabsTrigger value="tasks">Schedule Analysis</TabsTrigger>
           </TabsList>
           <TabsContent value="schedule" className="space-y-4">
             <div className="flex items-center justify-center space-x-4">
@@ -178,6 +183,7 @@ export default function AnalyzeSchedule() {
               error={error}
               dailyDurations={dailyDurations}
               aiAnalysis={aiAnalysis}
+              taskStatuses={taskStatuses}
             />
           </TabsContent>
           <TabsContent value="tasks" className="space-y-4">
@@ -194,11 +200,11 @@ export default function AnalyzeSchedule() {
               />
               <Button
                 onClick={fetchTaskStatuses}
-                disabled={isLoadingTaskStatus}
+                disabled={!startDate || !endDate || isLoadingTaskStatus}
                 className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white hover:from-blue-600 hover:to-cyan-600 transition-all duration-300"
               >
                 <ListTodoIcon className="w-4 h-4 mr-2" />
-                Fetch Task Statuses
+                Get Analytics
               </Button>
             </div>
             {(!startDate || !endDate) && (
@@ -230,7 +236,8 @@ export default function AnalyzeSchedule() {
               endDate={endDate}
               isLoading={isLoadingTaskStatus}
               error={taskStatusError}
-              taskStatuses={taskStatuses}
+              // taskStatuses={taskStatuses}
+              scheduleAnalytics = {scheduleAnalysis}
             />
           </TabsContent>
         </Tabs>
