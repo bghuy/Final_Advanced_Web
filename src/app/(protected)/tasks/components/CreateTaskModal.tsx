@@ -118,12 +118,6 @@ export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: Cr
                 render={({ field }) => <Input {...field} id="start_time" type="datetime-local" />}
                 rules={{
                   required: "Start time is required",
-                  validate: (value) => {
-                    if (!value) return "Start time is required";
-                    const selectedDate = new Date(value);
-                    const now = new Date();
-                    return selectedDate >= now || "Start time must be greater than or equal to the current date and time";
-                  },
                 }}
               />
             </div>

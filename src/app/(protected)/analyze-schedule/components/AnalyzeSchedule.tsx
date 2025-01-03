@@ -78,12 +78,6 @@ export default function AnalyzeSchedule() {
     setTaskStatusError(null)
 
     try {
-    //   let url = '/api/analyze-schedule?type=task/count-all-status'
-    //   if (startDate && endDate) {
-    //     const startTimeParam = encodeURIComponent(formatDateTime(startDate))
-    //     const endTimeParam = encodeURIComponent(formatDateTime(endDate))
-    //     url += `&start_time=${startTimeParam}&end_time=${endTimeParam}`
-    //   }
     const startTimeParam = formatDateTime(startDate)
     const endTimeParam = formatDateTime(endDate)
 
