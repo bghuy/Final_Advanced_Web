@@ -54,3 +54,15 @@ export const changePassword = async (new_password: string, old_password: string)
         throw error;
     }
 };
+
+export const sendForgotPassword = async (email: string) => {
+    try {
+        const response = await axios.post("/auth/send-forgot-password", {
+            email,
+        });
+        return response.data;
+    } catch (error) {
+        console.log("forgot password Error", error);
+        throw error;
+    }
+};
