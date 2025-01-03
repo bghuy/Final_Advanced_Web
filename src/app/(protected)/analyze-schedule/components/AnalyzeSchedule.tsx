@@ -49,8 +49,8 @@ export default function AnalyzeSchedule() {
     setError(null)
 
     try {
-        const startTimeParam = encodeURIComponent(formatDateTime(startDate))
-        const endTimeParam = encodeURIComponent(formatDateTime(endDate))
+        const startTimeParam = formatDateTime(startDate)
+        const endTimeParam = formatDateTime(endDate)
 
         const [dailyDurationsResponse, aiAnalysisResponse] = await Promise.all([
             getCountDailyDuration(startTimeParam, endTimeParam),
@@ -84,8 +84,8 @@ export default function AnalyzeSchedule() {
     //     const endTimeParam = encodeURIComponent(formatDateTime(endDate))
     //     url += `&start_time=${startTimeParam}&end_time=${endTimeParam}`
     //   }
-    const startTimeParam = encodeURIComponent(formatDateTime(startDate))
-    const endTimeParam = encodeURIComponent(formatDateTime(endDate))
+    const startTimeParam = formatDateTime(startDate)
+    const endTimeParam = formatDateTime(endDate)
 
         const response = await getCountAllStatus(startTimeParam, endTimeParam)
 
