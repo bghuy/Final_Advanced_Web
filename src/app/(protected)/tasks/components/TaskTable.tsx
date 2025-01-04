@@ -20,6 +20,7 @@ import { ColumnVisibilityToggle } from "./ColumnVisibilityToggle"
 import { getFirstDayOfMonth, getLastDayOfMonth } from "@/lib/utils"
 import { useDispatch } from 'react-redux';
 import { setSelectedTaskIds} from "../../../../../redux/slices/taskSlice"
+import { useRouter } from "next/navigation"
 // import { ScrollArea } from "@/components/ui/scroll-area"
 // import { ISODateString } from "@/types/ISODateString"
 interface TaskTableProps {
@@ -64,7 +65,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({ chatMode, refreshCount }) 
   const [startDate, setStartDate] = useState<Date | undefined>(new Date(getFirstDayOfMonth(now)));
   const [endDate, setEndDate] = useState<Date | undefined >(new Date(getLastDayOfMonth(now)));
   const dispatch = useDispatch();
-  
+  const router = useRouter()
 
 
   useEffect(() => {
@@ -283,8 +284,8 @@ export const TaskTable: React.FC<TaskTableProps> = ({ chatMode, refreshCount }) 
     })
   }
 
-  const handleAnalyzeTask = (task: Task) => {
-    console.log('Analyzing task:', task);
+  const handleFocusTimer = (task: Task) => {
+    router.push(`/focus-timer/${task.id}`)
   }
 
   const handleDateFilterApply = () => {
@@ -472,7 +473,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({ chatMode, refreshCount }) 
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleAnalyzeTask(task)}
+                    onClick={() => handleFocusTimer(task)}
                     disabled={isPending}
                   >
                     <ClockIcon className="mr-2 h-4 w-4" />

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import {User, LogOut, BarChart, Settings } from 'lucide-react'
+import {User, LogOut, BarChart, Settings, CalendarIcon } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { useSelector } from 'react-redux'
 import type { RootState } from './../../redux/store'
@@ -46,6 +46,15 @@ export default function Navbar() {
           >
             <BarChart className="h-5 w-5" />
             <span>Analyze with AI</span>
+          </Link>
+        </div>
+        <div className="hidden md:flex space-x-4">
+          <Link 
+            href="/calendar" 
+            className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-white/10 transition-colors duration-200"
+          >
+            <CalendarIcon className="h-5 w-5" />
+            <span>Calendar</span>
           </Link>
         </div>
       </div>
