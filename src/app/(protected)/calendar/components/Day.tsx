@@ -39,6 +39,7 @@ export const Day: React.FC<DayProps> = ({ date, tasks, droppableId }) => {
                 >
                   <div className="font-semibold truncate">{task.title}</div>
                   <div className="text-[10px] capitalize">{task.priority}</div>
+                  <div className="text-[10px] capitalize">{task.status}</div>
                 </div>
               )}
             </Draggable>

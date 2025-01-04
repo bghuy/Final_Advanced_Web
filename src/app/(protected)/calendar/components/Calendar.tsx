@@ -21,13 +21,20 @@ export const Calendar: React.FC<CalendarProps> = ({ tasks, setTasks }) => {
   const [viewMode, setViewMode] = useState<ViewMode>('month');
 
   function updateTaskEndTime(tasks: Task[], taskId: string, newEndTime: string): Task[] {
-    return tasks.map(task =>  
-      task.id === taskId 
-        ? { ...task, end_time: newEndTime } 
+    const now = new Date();
+    const currentTask = tasks.find(task => task.id === taskId);
+    return tasks.map(task =>
+      task.id === taskId
+        ? {
+            ...task,
+            end_time: newEndTime,
+            status: new Date(newEndTime) < now
+              ? 'expired'
+              : (currentTask?.status === 'expired' ? 'to do' : currentTask?.status) as 'expired' | 'to do' | 'in progress' | 'completed'
+          }
         : task
     );
-  }
-  const changeDate = (increment: number) => {
+  }  const changeDate = (increment: number) => {
     if (viewMode === 'month') {
       setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + increment, 1));
     } else {
@@ -49,7 +56,7 @@ export const Calendar: React.FC<CalendarProps> = ({ tasks, setTasks }) => {
       // console.log('Updated tasks:', updatedTasks);
       const task = updatedTasks.find(task => task.id === taskId);
       if (existingTask?.end_time !== task?.end_time && task) {
-        updatedTask(task);
+        updatedTask({...task, status: task?.status});
       }
       return updatedTasks;
     });    // const task = tasks.find(task => task.id === taskId);
