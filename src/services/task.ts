@@ -39,6 +39,19 @@ export const GetALLTask = async () => {
     }
 };
 
+export const GetTask = async (id: string) => {
+    try {
+        const response = await axios.get(`/task/${id}`);
+        return response.data;
+    } catch (error) {
+        if (error instanceof Error) {
+            console.log("Task not found!", error.message);
+        } else {
+            console.log("Task not found!", "An unknown error occurred");
+        }
+    }
+};
+
 export const CreateTask = async (task: CreateTaskType) => {
     try {
         const response = await axios.post("/task", task);
