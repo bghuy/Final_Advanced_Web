@@ -1,7 +1,7 @@
 import React from 'react';
 import { Task } from '@/types/task';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
-
+import { Badge } from '@/components/ui/badge'
 interface WeekViewProps {
   startDate: Date;
   tasks: Task[];
@@ -23,6 +23,32 @@ const WeekView: React.FC<WeekViewProps> = ({ startDate, tasks }) => {
            date1.getUTCDate() === d2.getUTCDate() &&
            date1.getUTCHours() === d2.getUTCHours();
   };
+    const getBadgeClassName = (priority: string) => {
+      switch (priority) {
+        case 'high':
+          return 'bg-red-500';
+        case 'medium':
+          return 'bg-yellow-500';
+        case 'low':
+          return 'bg-green-500';
+        default:
+          return 'bg-gray-500';
+      }
+    };
+    const getStatusColor = (status: Task['status']) => {
+      switch (status) {
+        case 'to do':
+          return 'bg-yellow-500'
+        case 'in progress':
+          return 'bg-blue-500'
+        case 'completed':
+          return 'bg-green-500'
+        case 'expired':
+          return 'bg-red-500'
+        default:
+          return 'bg-gray-500'
+      }
+    }
 
   return (
     <div className="grid grid-cols-8 gap-1">
@@ -49,7 +75,7 @@ const WeekView: React.FC<WeekViewProps> = ({ startDate, tasks }) => {
                   >
                     {tasks
                       .filter(task => task.end_time && isSameHour(cellDate, task.end_time))
-                      .map((task, index) => (
+                      .map((task: Task, index) => (
                         <Draggable key={task.id} draggableId={task.id} index={index}>
                           {(provided, snapshot) => (
                             <div
@@ -62,13 +88,19 @@ const WeekView: React.FC<WeekViewProps> = ({ startDate, tasks }) => {
                                 'bg-green-100 text-green-800'
                               } ${snapshot.isDragging ? 'opacity-70' : ''}`}
                             >
-                              <div className="font-semibold truncate">{task.title}</div>
-                              <div className="text-[10px] capitalize">{task.priority}</div>
+                            <div className="font-semibold truncate mb-2">{task.title}</div>
+                              <div className='flex flex-col gap-y-2 w-fit'>
+                                <Badge className={getBadgeClassName(task.priority)}>
+                                  {task.priority}
+                                </Badge>
+                                <Badge className={getStatusColor(task.status)}>
+                                  {task.status}
+                                </Badge>
+                              </div>
                             </div>
                           )}
                         </Draggable>
-                      ))}
-                    {provided.placeholder}
+                      ))}                    {provided.placeholder}
                   </div>
                 )}
               </Droppable>
