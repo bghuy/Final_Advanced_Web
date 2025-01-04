@@ -32,6 +32,21 @@ const renderColorfulLegendText = (value: string, entry: LegendProps) => {
     </span>
   );
 };
+function formatTime(value: number) {
+  const seconds = Math.floor(value % 60);
+  const minutes = Math.floor((value / 60) % 60);
+  const hours = Math.floor((value / 3600) % 24);
+  const days = Math.floor(value / 86400);
+
+
+  const result = [];
+  if (days > 0) result.push(`${days} day${days > 1 ? 's' : ''}`);
+  if (hours > 0) result.push(`${hours} hour${hours > 1 ? 's' : ''}`);
+  if (minutes > 0) result.push(`${minutes} minute${minutes > 1 ? 's' : ''}`);
+  if (seconds > 0) result.push(`${seconds} second${seconds > 1 ? 's' : ''}`);
+
+  return result.join(', ');
+}
 
 export function ScheduleAnalytics({
   isLoading,
@@ -69,7 +84,7 @@ export function ScheduleAnalytics({
                 <YAxis />
                 <Tooltip 
                   labelFormatter={(label) => format(parseISO(label), 'MMMM d, yyyy')}
-                  formatter={(value, name) => [`${value} minutes`, name]}
+                  formatter={(value, name) => [`${formatTime(Number(value))}`, name]}
                 />
                 <Legend />
                 <Bar dataKey="duration" fill="#8884d8" name="Actual Duration" />
@@ -90,8 +105,8 @@ export function ScheduleAnalytics({
                 {dailyDurations.map((day, index) => (
                   <tr key={index} className="hover:bg-gray-50 transition-colors duration-150">
                     <td className="px-6 py-4 whitespace-nowrap">{format(parseISO(day.date), 'MMMM d, yyyy')}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{day.duration} minutes</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{day.estimated_duration} minutes</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{formatTime(day.duration)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{formatTime(day.estimated_duration)}</td>
                   </tr>
                 ))}
               </tbody>

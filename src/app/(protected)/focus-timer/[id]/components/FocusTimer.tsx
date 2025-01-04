@@ -41,7 +41,7 @@ export function FocusTimer({ task }: { task: Task }) {
         const endTime = task.end_time ? new Date(task.end_time) : null
         
         if (endTime && now > endTime) {
-          createFocusTimer({duration: totalFocusTime, task_id: task.id, estimated_duration: estimatedTime})
+          createFocusTimer({duration: totalFocusTime || 1, task_id: task.id, estimated_duration: estimatedTime * 60 || 60})
           setIsActive(false)
           setTimeLeft(0)
           setIsEndTimeReached(true)
@@ -84,7 +84,7 @@ export function FocusTimer({ task }: { task: Task }) {
       setIsActive(false)
       setIsFocusTime(true)
       setTimeLeft(focusTime * 60)
-      await createFocusTimer({duration: Math.floor(totalFocusTime / 60) || 1, task_id: task.id, estimated_duration: estimatedTime || 1})
+      await createFocusTimer({duration: totalFocusTime || 1, task_id: task.id, estimated_duration: estimatedTime * 60 || 60})
       console.log(`Total focus time: ${Math.floor(totalFocusTime / 60)} minutes and ${totalFocusTime % 60} seconds`)
       setTotalFocusTime(0)
     } catch (error) {
