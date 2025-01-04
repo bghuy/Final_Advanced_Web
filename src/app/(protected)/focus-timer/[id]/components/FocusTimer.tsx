@@ -84,7 +84,7 @@ export function FocusTimer({ task }: { task: Task }) {
       setIsActive(false)
       setIsFocusTime(true)
       setTimeLeft(focusTime * 60)
-      await createFocusTimer({duration: Math.floor(totalFocusTime / 60), task_id: task.id, estimated_duration: estimatedTime})
+      await createFocusTimer({duration: Math.floor(totalFocusTime / 60) || 1, task_id: task.id, estimated_duration: estimatedTime || 1})
       console.log(`Total focus time: ${Math.floor(totalFocusTime / 60)} minutes and ${totalFocusTime % 60} seconds`)
       setTotalFocusTime(0)
     } catch (error) {
