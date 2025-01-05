@@ -195,7 +195,7 @@ export function AIChatBox({ onModeChange, onRequestRefresh }: { onModeChange: (m
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="recommend">Recommend</SelectItem>
-              <SelectItem value="set deadline">Time Modification</SelectItem>
+              <SelectItem value="set deadline">Task Modification</SelectItem>
             </SelectContent>
           </Select>
           {mode === 'set deadline' && (

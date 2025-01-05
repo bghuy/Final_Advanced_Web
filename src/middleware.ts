@@ -25,7 +25,7 @@ export async function middleware(req: NextRequest) {
         let userProfile = await GetUserProfile();
         const response = NextResponse.next();
         if (!userProfile) {
-            const refreshResponse = await axios.get('http://localhost:8080/api/v1/auth/refresh-token', {
+            const refreshResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/auth/refresh-token`, {
                 headers: {
                     Cookie: `refresh_token=${req.cookies?.get('refresh_token')?.value || ''}`
                 },
@@ -41,9 +41,8 @@ export async function middleware(req: NextRequest) {
                     path: '/',
                     expires: expirationTime,
                 });
-                console.log("done");
                 
-                const userProfileResponse = await axios.get('http://localhost:8080/api/v1/auth/profile', {
+                const userProfileResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/auth/profile`, {
                     headers: {
                         Authorization: `Bearer ${accessToken || ''}`,
                     },
@@ -70,7 +69,6 @@ export async function middleware(req: NextRequest) {
         return response;
     } catch (error) {
         console.log(error);
-        
         return NextResponse.redirect(new URL("/auth/login", nextUrl));
         
     }
