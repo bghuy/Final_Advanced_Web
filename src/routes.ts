@@ -11,6 +11,8 @@ export const publicRoutes = [
     "/task/:id/focus-timer",
     "/test",
     "/auth/forgot-password",
+    "/failed",
+    "/success"
 ];
 
 /**

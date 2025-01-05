@@ -1,7 +1,7 @@
 
 import { Skeleton } from "@/components/ui/skeleton"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, LegendProps } from 'recharts'
+import { XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, LegendProps, Line, LineChart } from 'recharts'
 import ReactMarkdown from 'react-markdown'
 import { format, parseISO } from 'date-fns'
 interface DailyDuration {
@@ -74,7 +74,7 @@ export function ScheduleAnalytics({
         <div className="mt-6 space-y-6">
           <h3 className="text-2xl font-semibold mb-4 text-center">Daily Durations</h3>
           <div className="h-80 w-full">
-            <ResponsiveContainer width="100%" height="100%">
+            {/* <ResponsiveContainer width="100%" height="100%">
               <BarChart data={dailyDurations}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis 
@@ -90,6 +90,37 @@ export function ScheduleAnalytics({
                 <Bar dataKey="duration" fill="#8884d8" name="Actual Duration" />
                 <Bar dataKey="estimated_duration" fill="#82ca9d" name="Estimated Duration" />
               </BarChart>
+            </ResponsiveContainer> */}
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={dailyDurations}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis 
+                  dataKey="date" 
+                  tickFormatter={(value) => format(parseISO(value), 'MMM d')}
+                />
+                <YAxis />
+                <Tooltip 
+                  labelFormatter={(label) => format(parseISO(label), 'MMMM d, yyyy')}
+                  formatter={(value, name) => [`${formatTime(Number(value))}`, name]}
+                />
+                <Legend />
+                <Line 
+                  type="monotone" 
+                  dataKey="duration" 
+                  stroke="#8884d8" 
+                  name="Actual Duration" 
+                  strokeWidth={2}
+                  dot={{ r: 4 }}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="estimated_duration" 
+                  stroke="#82ca9d" 
+                  name="Estimated Duration" 
+                  strokeWidth={2}
+                  dot={{ r: 4 }}
+                />
+              </LineChart>
             </ResponsiveContainer>
           </div>
           <div className="overflow-x-auto bg-white rounded-lg shadow">
@@ -103,11 +134,13 @@ export function ScheduleAnalytics({
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {dailyDurations.map((day, index) => (
-                  <tr key={index} className="hover:bg-gray-50 transition-colors duration-150">
-                    <td className="px-6 py-4 whitespace-nowrap">{format(parseISO(day.date), 'MMMM d, yyyy')}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{formatTime(day.duration)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{formatTime(day.estimated_duration)}</td>
-                  </tr>
+                  day.duration > 0 && day.estimated_duration > 0 && (
+                    <tr key={index} className="hover:bg-gray-50 transition-colors duration-150">
+                      <td className="px-6 py-4 whitespace-nowrap">{format(parseISO(day.date), 'MMMM d, yyyy')}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">{formatTime(day.duration)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">{formatTime(day.estimated_duration)}</td>
+                    </tr>
+                  )
                 ))}
               </tbody>
             </table>
@@ -182,4 +215,3 @@ export function ScheduleAnalytics({
     </div>
   )
 }
-

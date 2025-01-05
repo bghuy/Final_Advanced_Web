@@ -8,6 +8,7 @@ import { Task } from '@/types/task'
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar'
 import 'react-circular-progressbar/dist/styles.css'
 import { createFocusTimer } from '@/services/focus-timer'
+import { useNavbar } from '@/contexts/NavbarContext'
 
 export function FocusTimer({ task }: { task: Task }) {
   const [focusTime, setFocusTime] = useState(25)
@@ -19,6 +20,7 @@ export function FocusTimer({ task }: { task: Task }) {
   const [totalFocusTime, setTotalFocusTime] = useState(0)
   const [isEndTimeReached, setIsEndTimeReached] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const { setIsDisabled } = useNavbar();
   useEffect(() => {
     const checkEndTime = () => {
       const now = new Date()
@@ -45,6 +47,7 @@ export function FocusTimer({ task }: { task: Task }) {
           setIsActive(false)
           setTimeLeft(0)
           setIsEndTimeReached(true)
+          setIsDisabled(false)
           console.log(`Task "${task.title}" has reached its end time.`)
         } else {
           setTimeLeft((prevTime) => {
@@ -72,6 +75,7 @@ export function FocusTimer({ task }: { task: Task }) {
 
   const startFocus = () => {
     if (!isEndTimeReached) {
+      setIsDisabled(true)
       setIsActive(true)
       setIsFocusTime(true)
       setTimeLeft(focusTime * 60)
@@ -85,6 +89,7 @@ export function FocusTimer({ task }: { task: Task }) {
       setIsFocusTime(true)
       setTimeLeft(focusTime * 60)
       await createFocusTimer({duration: totalFocusTime || 1, task_id: task.id, estimated_duration: estimatedTime * 60 || 60})
+      setIsDisabled(false)
       console.log(`Total focus time: ${Math.floor(totalFocusTime / 60)} minutes and ${totalFocusTime % 60} seconds`)
       setTotalFocusTime(0)
     } catch (error) {
@@ -165,18 +170,20 @@ export function FocusTimer({ task }: { task: Task }) {
           </div>
         </div>
         <div className="flex justify-center space-x-4">
-          {!isActive && !isEndTimeReached && (
+          {!isActive && !isEndTimeReached && task.status === 'in progress' && (
             <Button onClick={startFocus} className="bg-blue-500 hover:bg-blue-600" disabled = {isLoading}>Start Focus</Button>
           )}
-          {isActive && (
+          {isActive && task.status === 'in progress' && (
             <Button onClick={endFocus} className="bg-red-500 hover:bg-red-600" disabled = {isLoading}>End Session</Button>
           )}
           {isEndTimeReached && (
             <div className="text-red-500 font-semibold">Task end time has passed. Timer cannot be started.</div>
+          )}
+          {!isEndTimeReached&& task.status !== 'in progress' && (
+            <div className="text-red-500 font-semibold">Change task status to in progress to continue</div>
           )}
         </div>
       </CardContent>
     </Card>
   )
 }
-

@@ -10,12 +10,13 @@ export default function Home() {
   useEffect(()=>{
     GetALLTask()
     .then(data => {
+      console.log(data,"data");
       setTasks(data)
     })
   },[])
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-4xl font-bold mb-8 text-center text-primary">Task Calendar</h1>
+      {/* <h1 className="text-4xl font-bold mb-8 text-center text-primary">Task Calendar</h1> */}
       <Calendar tasks={tasks} setTasks={setTasks} />
     </div>
   );

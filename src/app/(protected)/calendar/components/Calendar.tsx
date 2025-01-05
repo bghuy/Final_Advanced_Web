@@ -19,7 +19,10 @@ type ViewMode = 'month' | 'week';
 export const Calendar: React.FC<CalendarProps> = ({ tasks, setTasks }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<ViewMode>('month');
-
+  // const adjustToGMT7 = (date: Date): Date => {
+  //   const userTimezoneOffset = date.getTimezoneOffset() * 60000;
+  //   return new Date(date.getTime() + userTimezoneOffset + (7 * 60 * 60 * 1000));
+  // };
   function updateTaskEndTime(tasks: Task[], taskId: string, newEndTime: string): Task[] {
     const now = new Date();
     const currentTask = tasks.find(task => task.id === taskId);
@@ -49,7 +52,6 @@ export const Calendar: React.FC<CalendarProps> = ({ tasks, setTasks }) => {
 
     const destinationId = result.destination.droppableId;
     const taskId = result.draggableId;
-
     setTasks(prevTasks => {
       const existingTask = prevTasks.find(task => task.id === taskId);
       const updatedTasks = updateTaskEndTime(prevTasks, taskId, destinationId);
