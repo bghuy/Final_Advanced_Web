@@ -77,11 +77,11 @@ const WeekView: React.FC<WeekViewProps> = ({ startDate, tasks }) => {
                         }`}
                       >
                         <div className="font-semibold text-sm truncate">{task.title}</div>
-                        {task.start_time && task.end_time && (
+                        {/* {task.start_time && task.end_time && (
                           <div className="text-xs mt-1">
                             {format(new Date(task.start_time), 'HH:mm')} - {format(new Date(task.end_time), 'HH:mm')}
                           </div>
-                        )}
+                        )} */}
                       </div>
                     )}
                   </Draggable>
