@@ -120,13 +120,13 @@ export function EditTaskModal({ task, isOpen, onClose, onUpdateTask, isLoading }
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="edit-end_time" className="text-right">
-              Deadline
+              Endtime
             </Label>
             <div className="col-span-3">
               <Controller
                 name="end_time"
                 control={control}
-                rules={{ required: status !== 'to do' ? "Deadline is required" : false }}
+                rules={{ required: status !== 'to do' ? "Endtime is required" : false }}
                 render={({ field }) => <Input {...field} id="edit-end_time" type="datetime-local" />}
               />
               {errors.end_time && <p className="text-sm text-red-500 mt-1">{errors.end_time.message}</p>}

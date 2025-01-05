@@ -96,7 +96,7 @@ export function TaskDetailModal({ task, isOpen, onClose, onEdit, onDelete, hideA
             </div>
           }
           <div>
-            <Label className="text-right font-bold">Deadline</Label>
+            <Label className="text-right font-bold">Endtime</Label>
             <p className="text-sm text-gray-500">{new Date(task.end_time as string).toLocaleString()}</p>
           </div>
         </div>

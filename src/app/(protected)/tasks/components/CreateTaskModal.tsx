@@ -124,7 +124,7 @@ export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: Cr
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="end_time" className="text-right">
-              Deadline
+              Endtime
             </Label>
             <div className="col-span-3">
               <Controller
@@ -132,7 +132,7 @@ export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: Cr
                 control={control}
                 render={({ field }) => <Input {...field} id="end_time" type="datetime-local" />}
                 rules={{
-                  required: "Deadline is required",
+                  required: "Endtime is required",
                   validate: (value) => 
                     !start_time || !value || new Date(value) >= new Date(start_time) || 
                     "End time must be later than or equal to start time"
