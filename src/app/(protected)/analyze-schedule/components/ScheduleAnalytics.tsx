@@ -72,7 +72,7 @@ export function ScheduleAnalytics({
       )}
       {dailyDurations.length > 0 && (
         <div className="mt-6 space-y-6">
-          <h3 className="text-2xl font-semibold mb-4 text-center">Daily Durations</h3>
+          <h3 className="text-2xl font-semibold mb-4 text-center">Focus Time Tracker</h3>
           <div className="h-80 w-full">
             {/* <ResponsiveContainer width="100%" height="100%">
               <BarChart data={dailyDurations}>

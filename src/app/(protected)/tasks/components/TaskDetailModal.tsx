@@ -85,18 +85,18 @@ export function TaskDetailModal({ task, isOpen, onClose, onEdit, onDelete, hideA
           </div>
           {task.created_at && 
             <div>
-              <Label className="text-right font-bold">Created At</Label>
+              <Label className="text-right font-bold">Created</Label>
               <p className="text-sm text-gray-500">{new Date(task.created_at).toLocaleString()}</p>
             </div>
           }
           {task.updated_at && 
             <div>
-              <Label className="text-right font-bold">Updated At</Label>
+              <Label className="text-right font-bold">Last Updated</Label>
               <p className="text-sm text-gray-500">{new Date(task.updated_at).toLocaleString()}</p>
             </div>
           }
           <div>
-            <Label className="text-right font-bold">Endtime</Label>
+            <Label className="text-right font-bold">End time</Label>
             <p className="text-sm text-gray-500">{new Date(task.end_time as string).toLocaleString()}</p>
           </div>
         </div>

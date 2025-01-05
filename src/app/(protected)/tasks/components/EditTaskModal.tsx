@@ -24,6 +24,15 @@ export function EditTaskModal({ task, isOpen, onClose, onUpdateTask, isLoading }
   })
 
   const status = watch('status')
+  const start_time = watch('start_time')
+  const end_time = watch('end_time')
+
+  const validateTimeRange = (start: string, end: string) => {
+    const currentTime = new Date()
+    const startTime = new Date(start)
+    const endTime = new Date(end)
+    return currentTime >= startTime && currentTime <= endTime
+  }
 
   useEffect(() => {
     if (task) {
@@ -88,7 +97,15 @@ export function EditTaskModal({ task, isOpen, onClose, onUpdateTask, isLoading }
               <Controller
                 name="status"
                 control={control}
-                rules={{ required: "Status is required" }}
+                rules={{ 
+                  required: "Status is required",
+                  validate: (value) => {
+                    if (value === 'to do' && (!start_time || !end_time)) {
+                      return "Start time and End time are required for 'To Do' status"
+                    }
+                    return true
+                  }
+                }}
                 render={({ field }) => (
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <SelectTrigger>
@@ -115,18 +132,39 @@ export function EditTaskModal({ task, isOpen, onClose, onUpdateTask, isLoading }
                 name="start_time"
                 control={control}
                 render={({ field }) => <Input {...field} id="edit-start_time" type="datetime-local" />}
+                rules={{
+                  required: status === 'to do' ? "Start time is required for 'To Do' status" : false,
+                  validate: (value) => {
+                    if (status === 'to do' && end_time && value && !validateTimeRange(value, end_time)) {
+                      return "Current time must be between Start time and End time for 'To Do' status"
+                    }
+                    return true
+                  }                
+                }}
               />
+              {errors.start_time && <p className="text-sm text-red-500 mt-1">{errors.start_time.message}</p>}
             </div>
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="edit-end_time" className="text-right">
-              Endtime
+              End time
             </Label>
             <div className="col-span-3">
               <Controller
                 name="end_time"
                 control={control}
-                rules={{ required: status !== 'to do' ? "Endtime is required" : false }}
+                rules={{
+                  required: status === 'to do' ? "End time is required for 'To Do' status" : false,
+                  validate: (value) => {
+                    if (!start_time || !value || new Date(value) <= new Date(start_time)) {
+                      return "End time must be later than start time"
+                    }
+                    if (status === 'to do' && start_time && !validateTimeRange(start_time, value)) {
+                      return "Current time must be between Start time and End time for 'To Do' status"
+                    }
+                    return true
+                  }
+                }}
                 render={({ field }) => <Input {...field} id="edit-end_time" type="datetime-local" />}
               />
               {errors.end_time && <p className="text-sm text-red-500 mt-1">{errors.end_time.message}</p>}

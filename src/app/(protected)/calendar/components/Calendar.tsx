@@ -47,24 +47,63 @@ export const Calendar: React.FC<CalendarProps> = ({ tasks, setTasks }) => {
     }
   };
 
-  const onDragEnd = (result: DropResult) => {
-    if (!result.destination) return;
+  // const onDragEnd = (result: DropResult) => {
+  //   if (!result.destination) return;
 
-    const destinationId = result.destination.droppableId;
-    const taskId = result.draggableId;
-    setTasks(prevTasks => {
-      const existingTask = prevTasks.find(task => task.id === taskId);
-      const updatedTasks = updateTaskEndTime(prevTasks, taskId, destinationId);
-      // console.log('Updated tasks:', updatedTasks);
-      const task = updatedTasks.find(task => task.id === taskId);
-      if (existingTask?.end_time !== task?.end_time && task) {
-        updatedTask({...task, status: task?.status});
-      }
-      return updatedTasks;
-    });    // const task = tasks.find(task => task.id === taskId);
-    // console.log('Task:', task);
+  //   const destinationId = result.destination.droppableId;
+  //   const taskId = result.draggableId;
+  //   setTasks(prevTasks => {
+  //     const existingTask = prevTasks.find(task => task.id === taskId);
+  //     console.log(existingTask?.end_time,"existingTask");
+  //     console.log(destinationId,"destinationId");
+      
+  //     const updatedTasks = updateTaskEndTime(prevTasks, taskId, destinationId);
+  //     // console.log('Updated tasks:', updatedTasks);
+  //     const task = updatedTasks.find(task => task.id === taskId);
+  //     if (existingTask?.end_time !== task?.end_time && task) {
+  //       updatedTask({...task, status: task?.status});
+  //     }
+  //     return updatedTasks;
+  //   });    // const task = tasks.find(task => task.id === taskId);
+  //   // console.log('Task:', task);
     
-  };
+  // };
+
+  const onDragEnd = (result: DropResult) => {
+  if (!result.destination) return;
+
+  const destinationId = result.destination.droppableId;
+  const taskId = result.draggableId;
+
+  setTasks(prevTasks => {
+    const existingTask = prevTasks.find(task => task.id === taskId);
+
+    if (existingTask) {
+      const existingDate = new Date(existingTask?.end_time || '');
+      const destinationDate = new Date(destinationId);
+
+      destinationDate.setHours(
+        existingDate.getHours(),
+        existingDate.getMinutes(),
+        existingDate.getSeconds(),
+      );
+
+      const newEndTime = destinationDate.toISOString();
+      
+      const updatedTasks = updateTaskEndTime(prevTasks, taskId, newEndTime);
+
+      const task = updatedTasks.find(task => task.id === taskId);
+      if (task && existingTask.end_time !== task.end_time) {
+        updatedTask({ ...task, status: task.status });
+      }
+      
+      return updatedTasks;
+    }
+
+    return prevTasks;
+  });
+};
+
 
   const getWeekStartDate = (date: Date) => {
     const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));

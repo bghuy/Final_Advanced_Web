@@ -120,7 +120,7 @@ export default function TaskPage() {
         </div>
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2">
-            Endtime
+            End time
           </label>
           <p className="text-gray-700 text-base">{new Date(task.end_time as string).toLocaleDateString()}</p>
         </div>
@@ -142,13 +142,13 @@ export default function TaskPage() {
         </div>
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2">
-            Created At
+            Created
           </label>
           <p className="text-gray-700 text-base">{new Date(task.created_at).toLocaleString()}</p>
         </div>
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2">
-            Updated At
+            Last Updated
           </label>
           <p className="text-gray-700 text-base">{new Date(task.updated_at).toLocaleString()}</p>
         </div>

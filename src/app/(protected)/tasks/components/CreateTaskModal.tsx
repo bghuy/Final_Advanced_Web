@@ -1,4 +1,3 @@
-
 import { useForm, Controller } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -6,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog"
-import { CreateTaskType} from "@/types/task"
+import { CreateTaskType } from "@/types/task"
 import { Loader2 } from 'lucide-react'
 
 interface CreateTaskModalProps {
@@ -15,8 +14,6 @@ interface CreateTaskModalProps {
   onCreateTask: (newTask: CreateTaskType) => void
   isLoading: boolean
 }
-
-// type FormData = Omit<Task, 'id' | 'created_at' | 'updated_at'>
 
 export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: CreateTaskModalProps) {
   const { control, handleSubmit, watch, reset, formState: { errors, isValid } } = useForm<CreateTaskType>({
@@ -31,7 +28,16 @@ export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: Cr
     mode: 'onChange'
   })
 
+  const status = watch('status')
   const start_time = watch('start_time')
+  const end_time = watch('end_time')
+
+  const validateTimeRange = (start: string, end: string) => {
+    const currentTime = new Date()
+    const startTime = new Date(start)
+    const endTime = new Date(end)
+    return currentTime >= startTime && currentTime <= endTime
+  }
 
   const onSubmit = (data: CreateTaskType) => {
     const convertToISODateString = (date: string | undefined) => {
@@ -47,7 +53,6 @@ export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: Cr
     onCreateTask(data);
     reset();
   }
-  
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -89,7 +94,15 @@ export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: Cr
               <Controller
                 name="status"
                 control={control}
-                rules={{ required: "Status is required" }}
+                rules={{ 
+                  required: "Status is required",
+                  validate: (value) => {
+                    if (value === 'to do' && (!start_time || !end_time)) {
+                      return "Start time and End time are required for 'To Do' status"
+                    }
+                    return true
+                  }
+                }}
                 render={({ field }) => (
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <SelectTrigger>
@@ -117,14 +130,21 @@ export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: Cr
                 control={control}
                 render={({ field }) => <Input {...field} id="start_time" type="datetime-local" />}
                 rules={{
-                  required: "Start time is required",
+                  required: status === 'to do' ? "Start time is required for 'To Do' status" : false,
+                  validate: (value) => {
+                    if (status === 'to do' && end_time && value && !validateTimeRange(value, end_time)) {
+                      return "Current time must be between Start time and End time for 'To Do' status"
+                    }
+                    return true
+                  }                
                 }}
               />
+              {errors.start_time && <p className="text-sm text-red-500 mt-1">{errors.start_time.message}</p>}
             </div>
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="end_time" className="text-right">
-              Endtime
+              End time
             </Label>
             <div className="col-span-3">
               <Controller
@@ -132,28 +152,21 @@ export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: Cr
                 control={control}
                 render={({ field }) => <Input {...field} id="end_time" type="datetime-local" />}
                 rules={{
-                  required: "Endtime is required",
-                  validate: (value) => 
-                    !start_time || !value || new Date(value) >= new Date(start_time) || 
-                    "End time must be later than or equal to start time"
+                  required: status === 'to do' ? "End time is required for 'To Do' status" : false,
+                  validate: (value) => {
+                    if (!start_time || !value || new Date(value) <= new Date(start_time)) {
+                      return "End time must be later than start time"
+                    }
+                    if (status === 'to do' && start_time && !validateTimeRange(start_time, value)) {
+                      return "Current time must be between Start time and End time for 'To Do' status"
+                    }
+                    return true
+                  }
                 }}
-              />
-            </div>
-          </div>
-          {/* <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="end_time" className="text-right">
-              Deadline
-            </Label>
-            <div className="col-span-3">
-              <Controller
-                name="end_time"
-                control={control}
-                rules={{ required: status !== 'to do' ? "Deadline is required" : false }}
-                render={({ field }) => <Input {...field} id="end_time" type="datetime-local" />}
               />
               {errors.end_time && <p className="text-sm text-red-500 mt-1">{errors.end_time.message}</p>}
             </div>
-          </div> */}
+          </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="priority" className="text-right">
               Priority

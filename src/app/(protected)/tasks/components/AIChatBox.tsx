@@ -149,7 +149,7 @@ export function AIChatBox({ onModeChange, onRequestRefresh }: { onModeChange: (m
                       <Badge className={getStatusColor(task.status)}>{task.status}</Badge>
                       <Badge className={getPriorityColor(task.priority)}>{task.priority}</Badge>
                     </div>
-                    <p className="text-xs mt-1">Endtime: {new Date(task.end_time as string).toLocaleDateString()}</p>
+                    <p className="text-xs mt-1">End time: {new Date(task.end_time as string).toLocaleDateString()}</p>
                     <Button 
                       size="sm" 
                       variant="link" 
