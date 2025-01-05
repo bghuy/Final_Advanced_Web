@@ -12,7 +12,7 @@ export const publicRoutes = [
     "/test",
     "/auth/forgot-password",
     "/failed",
-    "/success"
+    "/success",
 ];
 
 /**
@@ -23,7 +23,8 @@ export const publicRoutes = [
 export const authRoutes = [
     "/auth/login",
     "/auth/register",
-    "/auth/error"
+    "/auth/error",
+    "/auth/social/login/redirect"
 ];
 
 /**

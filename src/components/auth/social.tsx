@@ -7,7 +7,9 @@ export const Social = () =>{
 
     const signInOauth = async(provider: "google" | "github") => {
         if(provider === "google") {
-            window.location.href = `http://localhost:8080/api/v1/auth/social/google/login`;
+            console.log(process.env.NEXT_PUBLIC_API_URL,"NEXT_PUBLIC_API_URL");
+            
+            window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/social/google/login` || `http://localhost:8080/api/v1/auth/social/google/login`;
         }
     }
     return(
