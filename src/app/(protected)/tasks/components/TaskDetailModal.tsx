@@ -1,10 +1,11 @@
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Task } from "@/types/task"
-import { Edit, Trash2, Loader2 } from 'lucide-react'
+import { Edit, Trash2, Loader2, Clock } from 'lucide-react'
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
+import { useRouter } from "next/navigation"
 
 interface TaskDetailModalProps {
   task: (Task & { created_at?: string, updated_at?: string }) | null;
@@ -19,7 +20,7 @@ interface TaskDetailModalProps {
 
 export function TaskDetailModal({ task, isOpen, onClose, onEdit, onDelete, hideAllActions, isLoading = false, onOpenEditModal }: TaskDetailModalProps) {
   //const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-
+  const router = useRouter()
   if (!task) return null;
 
   const getStatusColor = (status: Task['status']) => {
@@ -55,7 +56,7 @@ export function TaskDetailModal({ task, isOpen, onClose, onEdit, onDelete, hideA
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold">{task.title}</DialogTitle>
-          <DialogDescription>View task details.</DialogDescription>
+          <DialogDescription></DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div>
@@ -95,12 +96,18 @@ export function TaskDetailModal({ task, isOpen, onClose, onEdit, onDelete, hideA
             </div>
           }
           <div>
-            <Label className="text-right font-bold">Deadline</Label>
+            <Label className="text-right font-bold">Endtime</Label>
             <p className="text-sm text-gray-500">{new Date(task.end_time as string).toLocaleString()}</p>
           </div>
         </div>
         {!hideAllActions &&
           <div className="flex justify-end space-x-2">
+            <Button variant="outline" onClick={() => {
+              router.push(`/focus-timer/${task.id}`)
+            }}>
+              <Clock className="mr-2 h-4 w-4" />
+                Focus Timer
+            </Button>
             {onEdit && onOpenEditModal && (
               <Button variant="outline" onClick={() => {
                 onClose();

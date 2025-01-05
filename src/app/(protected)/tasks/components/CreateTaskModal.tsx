@@ -19,7 +19,7 @@ interface CreateTaskModalProps {
 // type FormData = Omit<Task, 'id' | 'created_at' | 'updated_at'>
 
 export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: CreateTaskModalProps) {
-  const { control, handleSubmit, watch, formState: { errors, isValid } } = useForm<CreateTaskType>({
+  const { control, handleSubmit, watch, reset, formState: { errors, isValid } } = useForm<CreateTaskType>({
     defaultValues: {
       title: '',
       description: '',
@@ -45,6 +45,7 @@ export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: Cr
     data.start_time = convertToISODateString(data.start_time);
     data.end_time = convertToISODateString(data.end_time);
     onCreateTask(data);
+    reset();
   }
   
 
@@ -117,19 +118,13 @@ export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: Cr
                 render={({ field }) => <Input {...field} id="start_time" type="datetime-local" />}
                 rules={{
                   required: "Start time is required",
-                  validate: (value) => {
-                    if (!value) return "Start time is required";
-                    const selectedDate = new Date(value);
-                    const now = new Date();
-                    return selectedDate >= now || "Start time must be greater than or equal to the current date and time";
-                  },
                 }}
               />
             </div>
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="end_time" className="text-right">
-              Deadline
+              Endtime
             </Label>
             <div className="col-span-3">
               <Controller
@@ -137,7 +132,7 @@ export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: Cr
                 control={control}
                 render={({ field }) => <Input {...field} id="end_time" type="datetime-local" />}
                 rules={{
-                  required: "Deadline is required",
+                  required: "Endtime is required",
                   validate: (value) => 
                     !start_time || !value || new Date(value) >= new Date(start_time) || 
                     "End time must be later than or equal to start time"

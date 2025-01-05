@@ -9,7 +9,10 @@ export const publicRoutes = [
     "/task/:id",
     "/ai-recommend",
     "/task/:id/focus-timer",
-    "/test"
+    "/test",
+    "/auth/forgot-password",
+    "/failed",
+    "/success"
 ];
 
 /**

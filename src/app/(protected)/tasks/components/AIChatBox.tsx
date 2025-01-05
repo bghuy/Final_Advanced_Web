@@ -31,7 +31,7 @@ export function AIChatBox({ onModeChange, onRequestRefresh }: { onModeChange: (m
   const [selectedColumn, setSelectedColumn] = useState<string>('standard')
   const [isTaskDetailModalOpen, setIsTaskDetailModalOpen] = useState(false)
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
-
+  const user = useSelector((state: RootState) => state.user);
   const previousModeRef = useRef<ChatMode | null>(null);
   const tasks = useSelector((state: RootState) => state.task);
   useEffect(() => {
@@ -149,7 +149,7 @@ export function AIChatBox({ onModeChange, onRequestRefresh }: { onModeChange: (m
                       <Badge className={getStatusColor(task.status)}>{task.status}</Badge>
                       <Badge className={getPriorityColor(task.priority)}>{task.priority}</Badge>
                     </div>
-                    <p className="text-xs mt-1">Deadline: {new Date(task.end_time as string).toLocaleDateString()}</p>
+                    <p className="text-xs mt-1">Endtime: {new Date(task.end_time as string).toLocaleDateString()}</p>
                     <Button 
                       size="sm" 
                       variant="link" 
@@ -165,15 +165,23 @@ export function AIChatBox({ onModeChange, onRequestRefresh }: { onModeChange: (m
           </div>
         ))}
       </ScrollArea>
-      <div className="border-t p-4 space-y-2">
+      <div className="border-t p-4 space-y-2 relative group">
+        {!user.verified && (
+          <div className="absolute inset-0 bg-gray-500 bg-opacity-150 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity group-hover:backdrop-filter group-hover:backdrop-blur-md">
+            <div className="text-white text-center">
+              <h4 >Please verify your email to use this feature.</h4>
+            </div>
+          </div>
+        )}
         <div className="flex space-x-2">
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Type your message..."
             onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+            disabled={!user.verified}
           />
-          <Button onClick={handleSendMessage} disabled={isLoading}>
+          <Button onClick={handleSendMessage} disabled={isLoading || !user.verified}>
             {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
           </Button>
         </div>
@@ -181,17 +189,17 @@ export function AIChatBox({ onModeChange, onRequestRefresh }: { onModeChange: (m
           <Select value={mode} onValueChange={(value) => {
             setMode(value as ChatMode);
             onModeChange(value as ChatMode);
-          }}>
+          }} disabled={!user.verified}>
             <SelectTrigger>
               <SelectValue placeholder="Select mode" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="recommend">Recommend</SelectItem>
-              <SelectItem value="set deadline">Set Deadline</SelectItem>
+              <SelectItem value="set deadline">Time Modification</SelectItem>
             </SelectContent>
           </Select>
           {mode === 'set deadline' && (
-            <Select value={selectedColumn} onValueChange={setSelectedColumn}>
+            <Select value={selectedColumn} onValueChange={setSelectedColumn} disabled={!user.verified}>
               <SelectTrigger>
                 <SelectValue placeholder="Select column" />
               </SelectTrigger>

@@ -44,6 +44,12 @@ export const CardWrapper = ({
                     label = {backButtonLabel}
                     href = {backButtonHref}
                 />
+                {backButtonHref === "/auth/register"  &&
+                    <BackButton
+                        label = "Forgot Password"
+                        href = "/auth/forgot-password"
+                    />
+                }
             </CardFooter>
         </Card>
     )
