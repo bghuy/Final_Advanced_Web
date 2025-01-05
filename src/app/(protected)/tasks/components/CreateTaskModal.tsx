@@ -97,8 +97,8 @@ export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: Cr
                 rules={{ 
                   required: "Status is required",
                   validate: (value) => {
-                    if (value === 'to do' && (!start_time || !end_time)) {
-                      return "Start time and End time are required for 'To Do' status"
+                    if (value === 'in progress' && (!start_time || !end_time)) {
+                      return "Start time and End time are required for 'In Progress' status"
                     }
                     return true
                   }
@@ -130,10 +130,10 @@ export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: Cr
                 control={control}
                 render={({ field }) => <Input {...field} id="start_time" type="datetime-local" />}
                 rules={{
-                  required: status === 'to do' ? "Start time is required for 'To Do' status" : false,
+                  required: status === "in progress" ? "Start time is required for 'In progress' status" : false,
                   validate: (value) => {
-                    if (status === 'to do' && end_time && value && !validateTimeRange(value, end_time)) {
-                      return "Current time must be between Start time and End time for 'To Do' status"
+                    if (status === 'in progress' && end_time && value && !validateTimeRange(value, end_time)) {
+                      return "Current time must be between Start time and End time for 'In Progress' status"
                     }
                     return true
                   }                
@@ -152,13 +152,13 @@ export function CreateTaskModal({ isOpen, onClose, onCreateTask, isLoading }: Cr
                 control={control}
                 render={({ field }) => <Input {...field} id="end_time" type="datetime-local" />}
                 rules={{
-                  required: status === 'to do' ? "End time is required for 'To Do' status" : false,
+                  required: status === 'in progress' ? "End time is required for 'In Progress' status" : false,
                   validate: (value) => {
                     if (!start_time || !value || new Date(value) <= new Date(start_time)) {
                       return "End time must be later than start time"
                     }
-                    if (status === 'to do' && start_time && !validateTimeRange(start_time, value)) {
-                      return "Current time must be between Start time and End time for 'To Do' status"
+                    if (status === 'in progress' && start_time && !validateTimeRange(start_time, value)) {
+                      return "Current time must be between Start time and End time for 'In progress' status"
                     }
                     return true
                   }
