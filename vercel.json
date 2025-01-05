@@ -1,0 +1,8 @@
+{
+    "functions": {
+      "/**": {
+        "runtime": "nodejs21.x"
+      }
+    }
+  }
+  
